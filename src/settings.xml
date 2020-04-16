@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FILE>
+<SQL>
+<TPerson>
+	<description>
+		Объект содержащих данные о сотруднике
+	</description>
+	<getDataPerson>
+		<description>
+			Запрос для получения данных о сотруднике
+		</description>
+		<query>
+			SELECT idPerson, family, name, parent, person_no, sex, birthday, placeborn, payposition, kodunit, field_duty, dopusk, inn, file_image, GET_CURRENT_ACTION(idPerson, 1, 0) as rank_person, GET_CURRENT_ACTION(idPerson, 2, 0) as position_person, GET_CURRENT_ACTION(idPerson, 3, 0) as class_person, GET_FULL_NAME_UNIT_LEVEL(kodunit, -1, 'i') as name_unit FROM main WHERE idPerson = %d
+		</query>
+	</getDataPerson>
+</TPerson>
+<ListPerson>
+	<description>
+		Список сотрудников
+	</description>
+	<getListPersonsUnit>
+		<description>
+			Список сотрудников подразделения с идентификтором kodunit
+		</description>
+		<query>
+			SELECT idPerson, family, name, parent FROM main WHERE kodunit=%d
+		</query>
+	</getListPersonsUnit>
+	<getListPersons>
+		<description>
+			Список сотрудников 
+		</description>
+		<query>
+			SELECT idPerson, family, name, parent FROM main
+		</query>
+	</getListPersons>
+</ListPerson>
+<ListUnits>
+	<description>
+		Класс списка подразделений
+	</description>
+	<TUnit>
+		<description>
+			Запрос возвращает полное название подарзделения
+		</description>
+		<query>
+			SELECT GET_FULL_NAME_UNIT_LEVEL(%d, 2, 'i'), GET_FULL_NAME_UNIT_LEVEL(%d, -1, 'i')
+		</query>
+	</TUnit>
+</ListUnits>
+<TypesHoliday>
+	<loadTypes>
+		<description>
+			Запрос возвращает типы отпусков
+		</description>
+		<query>
+			SELECT id_type_otpusk, name_type, name_type_r FROM types_otpusk
+		</query>
+	</loadTypes>
+</TypesHoliday>
+<ListHolidays>
+	<loadHolidays>
+		<description>
+			Запрос возвращает планируемые отпуска для сотрудника с идентификатором cod_person в выбранном году
+		</description>
+		<query>
+			SELECT p.id_otpusk as id, p.plan_begin date, p.plan_size+p.plan_time_travel as size, t.name_type as type FROM plan_otpusk p, types_otpusk t WHERE t.id_type_otpusk=p.cod_type AND YEAR(plan_begin)=%d AND cod_person=%d ORDER BY plan_begin;
+		</query>
+	</loadHolidays>
+</ListHolidays>
+<THoliday>
+	<getPersonHolidays>
+		<description>
+			Запрос возвращает планируемые отпуска для сотрудника с идентификатором cod_person в выбранном году
+		</description>
+		<query>
+			SELECT p.id_otpusk as id, t.name_type as name_type, p.plan_begin as date_begin, p.plan_size as size, p.plan_time_travel as duration FROM plan_otpusk p, types_otpusk t WHERE year(p.plan_begin) = %d and t.id_type_otpusk=p.cod_type AND p.cod_person=%d ORDER BY p.plan_begin; 
+		</query>
+	</getPersonHolidays>
+	<getHoliday>
+		<description>
+			Запрос возвращает планируемый отпуск по коду отпуска
+		</description>
+		<query>
+			SELECT p.id_otpusk as id, t.name_type as name_type, p.cod_person as person, p.plan_begin as date_begin, p.plan_size as size, p.plan_time_travel as duration FROM plan_otpusk p, types_otpusk t WHERE t.id_type_otpusk=p.cod_type AND p.id_otpusk=%d; 
+		</query>
+	</getHoliday>
+</THoliday>
+</SQL>
+<SettingsApplication>
+	<description>
+		Настройки приложения
+	</description>
+	<unit>
+	</unit>
+</SettingsApplication>
+</FILE>

@@ -1,0 +1,7 @@
+#ifndef _VERSION_H
+#define _VERSION_H
+
+const char *g_version = "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}";
+
+#endif // _VERSION_H
+
