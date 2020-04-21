@@ -19,6 +19,8 @@ public:
 	THoliday();
 	THoliday(int cod_holiday);
 	THoliday(int _cod_person, std::string s_date, int duration, std::string _name_holiday):cod_person(_cod_person), date_begin(boost::gregorian::from_simple_string(std::string(s_date))), holiday_duration(boost::gregorian::date_duration(duration)), name_holiday(_name_holiday){};
+	THoliday& operator+(int numdays);
+	THoliday& operator-(int numdays);
 	void displayHoliday() const;
 private:
 	static const std::string templateSQLHoliday;

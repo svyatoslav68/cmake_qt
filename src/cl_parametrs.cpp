@@ -24,15 +24,7 @@ clParametrs::clParametrs():idUnit(-1),workYear(-1),conf_file(std::string("settin
 	bd_connect(&descriptorBD, name_bd);
 }
 
-clParametrs::clParametrs(int argc, char *argv[]){
-	ops_desc.add_options()
-		("unit,u", po::value<int>(&idUnit), "Persons unit")
-		("year,y", po::value<int>(), "Year")
-		("file,f", po::value<std::string>(&conf_file)->default_value(std::string("settings.xml")), "Congiguration file (default settings.xml)")
-		("help,h", "Show help")
-		("save,s", "Save parametrs")
-		("version,v", "Show version of application")
-	;
+clParametrs::clParametrs(int argc, char *argv[]):clParametrs(){
 	po::store(po::command_line_parser(argc, argv).options(ops_desc).positional(pos_desc).run(), op_store);
 	po::notify(op_store);
 	if(op_store.count("help")){
@@ -44,7 +36,6 @@ clParametrs::clParametrs(int argc, char *argv[]){
 		std::cout << "Версия № " << g_version << std::endl;
 		std::exit(0);
 	}
-	bd_connect(&descriptorBD, name_bd);
 }
 
 clParametrs::~clParametrs(){

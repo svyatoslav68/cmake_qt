@@ -6,6 +6,7 @@
 #include <boost/format.hpp>
 #include "tholiday.hpp"
 #include "str_from_file.hpp"
+using bdd=boost::gregorian::date_duration;
 
 const std::string THoliday::templateSQLHoliday=ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "THoliday", "getHoliday");
 
@@ -43,3 +44,12 @@ using namespace boost::gregorian;
 	std::cout << std::setw(40) << std::setfill(' ') << std::left << name_holiday << std::setw(13) << date_begin << std::setw(3) << std::right << holiday_duration << std::endl;
 }
 
+THoliday& THoliday::operator+(int numdays){
+	holiday_duration += bdd(numdays);
+	return *this;
+}
+
+THoliday& THoliday::operator-(int numdays){
+	holiday_duration -= bdd(numdays);
+	return *this;
+}

@@ -13,6 +13,8 @@
 #include <QTableView>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <vector>
+#include <string>
 #include "main_window.hpp"
 #include "tholiday.hpp"
 #include "holiday_table_model.hpp"
@@ -23,8 +25,11 @@ MainWindow::MainWindow(){
 	setWindowTitle("График отпусков");
 	mainScene  =new QGraphicsScene();
 	mainScene->addEllipse(QRectF(-100.0, -100.0, 75.0, 75.0));
-	mainView = new QTableView();//QGraphicsView();
 	//mainView->setScene(mainScene);
+	std::vector<std::string> v = {"Иванов", "Петров", "Сидоров"};
+	holidayModel = new HolidayTableModel(v);
+	mainView = new QTableView();//QGraphicsView();
+	mainView->setModel(holidayModel);
 	setCentralWidget(mainView);
 	createActions();
 	createMenu();

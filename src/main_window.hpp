@@ -14,6 +14,7 @@ class QWidget;
 class QTableView;
 //class QGraphicsView;
 class QGraphicsScene;
+class HolidayTableModel;
 
 class MainWindow: public QMainWindow {
 Q_OBJECT
@@ -30,6 +31,7 @@ private:
 	QMenu *menuFile, *menuView, *menuSettings, *menuHelp;
 	//QWidget *mainWidget;
 	QGraphicsScene *mainScene;
+	HolidayTableModel *holidayModel;
 	QTableView *mainView;
 	//QGraphicsView *mainView;
 private slots:
