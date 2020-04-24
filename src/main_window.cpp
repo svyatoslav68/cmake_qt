@@ -18,6 +18,8 @@
 #include "main_window.hpp"
 #include "tholiday.hpp"
 #include "holiday_table_model.hpp"
+#include "holiday_delegate.hpp"
+#include "holiday_view.hpp"
 
 MainWindow::MainWindow(){
 	//setAttribute(Qt::WA_DeleteOnClose); // Атрибут показывает, что после закрытия окна, его нужно удалить из памяти
@@ -27,9 +29,12 @@ MainWindow::MainWindow(){
 	mainScene->addEllipse(QRectF(-100.0, -100.0, 75.0, 75.0));
 	//mainView->setScene(mainScene);
 	std::vector<std::string> v = {"Иванов", "Петров", "Сидоров"};
-	holidayModel = new HolidayTableModel(v);
-	mainView = new QTableView();//QGraphicsView();
+	//holidayModel = new HolidayTableModel(v);
+	holidayModel = new HolidayTableModel();
+	mainView = new HolidayView();//QGraphicsView();
 	mainView->setModel(holidayModel);
+	HolidayDelegate *graphicDelegate = new HolidayDelegate();
+	mainView->setItemDelegateForColumn(2, graphicDelegate);
 	setCentralWidget(mainView);
 	createActions();
 	createMenu();

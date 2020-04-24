@@ -15,6 +15,7 @@ class QTableView;
 //class QGraphicsView;
 class QGraphicsScene;
 class HolidayTableModel;
+class HolidayView;
 
 class MainWindow: public QMainWindow {
 Q_OBJECT
@@ -32,7 +33,7 @@ private:
 	//QWidget *mainWidget;
 	QGraphicsScene *mainScene;
 	HolidayTableModel *holidayModel;
-	QTableView *mainView;
+	HolidayView *mainView;
 	//QGraphicsView *mainView;
 private slots:
 	void clickedOk();

@@ -15,13 +15,16 @@ class QGraphicsScene;
 class QVariant;
 class QModelIndex;
 
+extern clParametrs appParametrs;
+
 class HolidayTableModel: public QAbstractItemModel {
 	Q_OBJECT
 public:
 	HolidayTableModel(std::vector<std::string> persons);
-	HolidayTableModel(std::string SQL_persons);
+	HolidayTableModel();
 	~HolidayTableModel();
-	/* Методы QAbstractItemModel, которые необходимо переопределять в классе-потомке*/
+	/* Методы QAbstractItemModel, которые необходимо переопределять 
+	 * в классе-потомке*/
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation, int role) const;
@@ -30,7 +33,9 @@ public:
 	QModelIndex index ( int row, int column, const QModelIndex &) const;
 	QModelIndex parent ( const QModelIndex & ) const;
 private:
-	HolidayTableModel(){};
+	const std::string Template_SQL_Fill;
+	const std::string Template_SQL_Holidays;
+	//HolidayTableModel(){};
 	enum Column {Number, FIO, Holidays};
 	static const int COLUMN_COUNT = 3;
 	std::map<int, std::pair<std::string, std::vector<THoliday>*>> content;

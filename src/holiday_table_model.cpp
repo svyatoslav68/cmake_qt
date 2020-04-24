@@ -1,32 +1,66 @@
-/***********************************************************************
-******** Файл реализации класса HolidayTableModel **********************
-********     файл holiday_table_model.cpp         **********************
-***********************************************************************/
+/************************************************************
+******** Файл реализации класса HolidayTableModel ***********
+********     файл holiday_table_model.cpp         ***********
+************************************************************/
 #include <utility>
 #include <map>
 #include <vector>
 #include <string>
 #include <QVariant>
 #include <QGraphicsScene>
-#include "holiday_table_model.hpp"
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
+#include "str_from_file.hpp"
+#include "cl_parametrs.hpp"
+#include "holiday_table_model.hpp"
 
 using std::pair;
 using std::vector;
 using std::map;
 using std::string;
 
-HolidayTableModel::HolidayTableModel(vector<std::string> persons){
+//const string HolidayTableModel::Template_SQL_Fill =  ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "ListPerson", "getListPersonsUnit");
+
+HolidayTableModel::HolidayTableModel(vector<std::string> persons):
+										HolidayTableModel(){
 	auto person_iterator = persons.cbegin();
 	int number = 0;
 	while(person_iterator < persons.cend()){
-		pair<std::string, std::vector<THoliday>*> p(*person_iterator, new vector<THoliday>());
+		pair<std::string, std::vector<THoliday>*> 
+				p(*person_iterator, new vector<THoliday>());
 		content[++number] = p;
 		person_iterator++;
 	}
 }
 
-HolidayTableModel::HolidayTableModel(std::string SQL_persons){
+HolidayTableModel::HolidayTableModel():								
+	Template_SQL_Fill(ValuesFromXML(appParametrs.getNameConfFile().c_str()).
+	getStrSQL("FILE.SQL", "ListPerson", "getListPersonsUnit")),
+	Template_SQL_Holidays(ValuesFromXML(appParametrs.getNameConfFile().
+	c_str()).getStrSQL("FILE.SQL", "THoliday", "getPersonHolidays"))
+{
+	MYSQL_RES *data_from_BD = nullptr;
+	boost::format fmter(Template_SQL_Fill);
+	std::stringstream ss;
+	ss << fmter%appParametrs.getIdUnit();
+	std::string SQL = ss.str();
+	int mysql_status = 0;
+	mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
+	if (mysql_status){
+		std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
+	}
+	else {
+		data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
+		MYSQL_ROW row;
+		row = mysql_fetch_row(data_from_BD);
+		int number = 0;
+		while (row){
+			pair<std::string, std::vector<THoliday>*> p(row[1], new vector<THoliday>());
+			content[++number] = p;
+			row = mysql_fetch_row(data_from_BD);
+		}
+	}
 
 }
 

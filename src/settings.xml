@@ -86,12 +86,24 @@
 		</query>
 	</getHoliday>
 </THoliday>
+<HolidayTableModel>
+	<getAllHolidays>
+		<description>
+			Запрос возвращает все отпуска планируемые в заданном году
+		</description>
+		<query>
+			SELECT p.cod_person as cod_person, m.family as FIO, t.name_type as type, p.plan_begin as begib, p.plan_size as duration FROM plan_otpusk p, types_otpusk t, main m WHERE m.idPerson = p.cod_person AND t.id_type_otpusk = p.cod_type AND YEAR(plan_begin)=2020 ORDER BY p.cod_person, p.plan_begin;
+		</query>
+	</getAllHolidays>
+</HolidayTableModel>
 </SQL>
 <SettingsApplication>
 	<description>
 		Настройки приложения
 	</description>
-	<unit>
+	<unit>40
 	</unit>
+	<year>2020
+	</year>
 </SettingsApplication>
 </FILE>
