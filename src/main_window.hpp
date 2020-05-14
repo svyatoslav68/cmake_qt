@@ -21,13 +21,14 @@ class MainWindow: public QMainWindow {
 Q_OBJECT
 public:
 	MainWindow();
+	virtual ~MainWindow();
 private:
 	void createActions();
 	void createMenu();
 	QAction *actExit;
 	QActionGroup *grpView;
 	QAction *actPlan, *actResult, *actRefresh;
-	QAction *actUnit, *actSetColors;
+	QAction *actConditions, *actUnit, *actSetColors;
 	QAction *actHelpApplication, *actAboutQt;
 	QMenu *menuFile, *menuView, *menuSettings, *menuHelp;
 	//QWidget *mainWidget;
@@ -36,6 +37,7 @@ private:
 	HolidayView *mainView;
 	//QGraphicsView *mainView;
 private slots:
+	void dialogConditions();
 	void clickedOk();
 	void viewHelp();
 	void aboutQt();

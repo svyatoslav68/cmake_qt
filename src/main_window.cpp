@@ -12,6 +12,7 @@
 #include <Qt>
 #include <QTableView>
 #include <QGraphicsView>
+#include <QHeaderView>
 #include <QGraphicsScene>
 #include <vector>
 #include <string>
@@ -20,6 +21,9 @@
 #include "holiday_table_model.hpp"
 #include "holiday_delegate.hpp"
 #include "holiday_view.hpp"
+#include "dialog_conditions.hpp"
+
+extern clParametrs appParametrs;
 
 MainWindow::MainWindow(){
 	//setAttribute(Qt::WA_DeleteOnClose); // Атрибут показывает, что после закрытия окна, его нужно удалить из памяти
@@ -31,13 +35,21 @@ MainWindow::MainWindow(){
 	std::vector<std::string> v = {"Иванов", "Петров", "Сидоров"};
 	//holidayModel = new HolidayTableModel(v);
 	holidayModel = new HolidayTableModel();
-	mainView = new HolidayView();//QGraphicsView();
+	int year = appParametrs.getYear();
+	mainView = new HolidayView(nullptr, 365 + static_cast<int>((year % 4 == 0 && year % 100 != 0)||(year % 400 == 0)));//QGraphicsView();
 	mainView->setModel(holidayModel);
+	mainView->setSizeColumns();
 	HolidayDelegate *graphicDelegate = new HolidayDelegate();
 	mainView->setItemDelegateForColumn(2, graphicDelegate);
 	setCentralWidget(mainView);
+	setGeometry(10, 30, 1100, 600);
 	createActions();
 	createMenu();
+}
+
+MainWindow::~MainWindow(){
+	delete mainView;
+	delete holidayModel;
 }
 
 void MainWindow::createActions(){
@@ -54,6 +66,9 @@ void MainWindow::createActions(){
 	grpView->addAction(actResult);
 	actResult->setChecked(true);
 	actRefresh = new QAction("Обновить");
+	actConditions = new QAction("Условия");
+	actConditions->setShortcut(QKeySequence("CTRL-U"));
+	connect(actConditions, SIGNAL(triggered()), this, SLOT(dialogConditions()));
 	actUnit = new QAction("Подразделение");
 	actSetColors = new QAction("Цвета");
 	actHelpApplication = new QAction("Помощь", this);
@@ -74,6 +89,7 @@ void MainWindow::createMenu(){
 	menuView->addSeparator();
 	menuView->addAction(actRefresh);
 	menuSettings = menuBar()->addMenu("Настройки");
+	menuSettings->addAction(actConditions);
 	menuSettings->addAction(actUnit);
 	menuSettings->addAction(actSetColors);
 	//menuSettings->addAction(act);
@@ -92,4 +108,13 @@ void MainWindow::aboutQt(){
 }
 
 void MainWindow::viewHelp(){
+}
+
+void MainWindow::dialogConditions(){
+	DialogConditions *dialog = new DialogConditions();
+	if (dialog->exec() == QDialog::Accepted)
+	{
+		dialog->saveConfiguration();
+	}
+	delete dialog;
 }

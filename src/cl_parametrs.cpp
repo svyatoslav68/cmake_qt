@@ -54,13 +54,14 @@ void clParametrs::loadFromFile(){
 	tmp = vx.getIntValue("year");
 	if ((tmp != -1) && (!year_from_cl))
 		workYear = tmp;
+	std::cout << "Size of ValuesFromXML = " << sizeof(vx) << std::endl;
 }
 
 void clParametrs::saveSettings(){
 	ValuesFromXML vx(conf_file.c_str());
 	vx.putIntValue("unit", idUnit);
 	vx.putIntValue("year", workYear);
-	vx.saveSettings("FILE.SettingsApplication");
+	vx.saveApplicationSettings("FILE.SettingsApplication");
 }
 
 

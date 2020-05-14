@@ -20,6 +20,7 @@ extern clParametrs appParametrs;
 class HolidayTableModel: public QAbstractItemModel {
 	Q_OBJECT
 public:
+	enum Column {Number, FIO, Holidays};
 	HolidayTableModel(std::vector<std::string> persons);
 	HolidayTableModel();
 	~HolidayTableModel();
@@ -36,7 +37,6 @@ private:
 	const std::string Template_SQL_Fill;
 	const std::string Template_SQL_Holidays;
 	//HolidayTableModel(){};
-	enum Column {Number, FIO, Holidays};
 	static const int COLUMN_COUNT = 3;
 	std::map<int, std::pair<std::string, std::vector<THoliday>*>> content;
 };

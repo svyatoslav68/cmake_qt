@@ -11,8 +11,10 @@ class QWidget;
 
 class HolidayView : public QTableView{
 public:
-	explicit HolidayView(QWidget *parent = nullptr);
+	explicit HolidayView(QWidget *parent = nullptr, int days_in_year = 365);
+	void setSizeColumns();
 private:
+	int year_days;
 };
 
 #endif //MYTABLEVIEW_HPP

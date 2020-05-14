@@ -26,6 +26,14 @@
 			SELECT idPerson, family, name, parent FROM main WHERE kodunit=%d
 		</query>
 	</getListPersonsUnit>
+	<getMilitaryPersonsUnit>
+		<description>
+			Список военнослужащих подразделения 
+		</description>
+		<query>
+			SELECT m.idPerson, GET_CURRENT_ACTION(idPerson, 2, 0) as position_person, CONCAT(m.family, " ", LEFT(m.name,1), ". ", LEFT(m.parent,1), ".") AS "FIO", m.family, m.name, m.parent FROM main m WHERE m.kodunit=%d AND IS_MILITARY(m.idPerson)
+		</query>
+	</getMilitaryPersonsUnit>
 	<getListPersons>
 		<description>
 			Список сотрудников 
@@ -106,4 +114,6 @@
 	<year>2020
 	</year>
 </SettingsApplication>
+<Groups>
+</Groups>
 </FILE>
