@@ -104,6 +104,24 @@
 		</query>
 	</getAllHolidays>
 </HolidayTableModel>
+<TUnits>
+	<getNameUnits>
+		<description>
+			Запрос возвращает список всех организаций и подразделений, отсортированных по уровню, для постоения дерева
+		</description>
+		<query>
+			SELECT `idUnit` as `id`, IF(`view_type`='none', `name`, CONVERT(IF(`view_type`='before',CONCAT_WS(' ',type, IFNULL(IF(`name`='',`number`,`name`), `number`)), CONCAT_WS(' ', IFNULL(IF(`name`='',`number`,`name`), `number`),`type`)) using utf8)) AS `display name`, GET_FULL_NAME_UNIT(idUnit) as `full name`, level, parent, number, type, view_type FROM list_staff ORDER BY level, number;
+		</query>
+	</getNameUnits>
+	<getPropertyUnit>
+		<description>
+			Запрос возвращает свойства подразделения по его идентификатору
+		</description>
+		<query>
+			SELECT `idUnit` as `id`, IF(`view_type`='none', `name`, CONVERT(IF(`view_type`='before',CONCAT_WS(' ',type, IFNULL(IF(`name`='',`number`,`name`), `number`)), CONCAT_WS(' ', IFNULL(IF(`name`='',`number`,`name`), `number`),`type`)) using utf8)) AS `display name`, GET_FULL_NAME_UNIT(idUnit) as `full name`, level, parent FROM list_staff WHERE idUnit = %d;
+		</query>
+	</getPropertyUnit>
+</TUnits>
 </SQL>
 <SettingsApplication>
 	<description>
@@ -115,5 +133,15 @@
 	</year>
 </SettingsApplication>
 <Groups>
+	<All>
+		<member>2</member>
+		<member>10</member>
+		<member>148</member>
+		<member>151</member>
+	</All>
+	<Duty>
+		<member>10</member>
+		<member>148</member>
+	</Duty>
 </Groups>
 </FILE>

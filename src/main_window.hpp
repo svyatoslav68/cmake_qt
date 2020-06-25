@@ -16,6 +16,7 @@ class QTableView;
 class QGraphicsScene;
 class HolidayTableModel;
 class HolidayView;
+class HolidayDelegate;
 
 class MainWindow: public QMainWindow {
 Q_OBJECT
@@ -25,19 +26,27 @@ public:
 private:
 	void createActions();
 	void createMenu();
+	void createModelAndView();
 	QAction *actExit;
 	QActionGroup *grpView;
 	QAction *actPlan, *actResult, *actRefresh;
 	QAction *actConditions, *actUnit, *actSetColors;
+	QActionGroup *grpScale;
+	QAction *act1x, *act2x, *act3x;
+	QAction *actBackGround;
 	QAction *actHelpApplication, *actAboutQt;
 	QMenu *menuFile, *menuView, *menuSettings, *menuHelp;
+	QMenu *menuScale;
 	//QWidget *mainWidget;
-	QGraphicsScene *mainScene;
 	HolidayTableModel *holidayModel;
 	HolidayView *mainView;
-	//QGraphicsView *mainView;
+	HolidayDelegate *graphicDelegate;//QGraphicsView *mainView;
+	int scale;
 private slots:
+	void changeScale(int new_scale);
 	void dialogConditions();
+	void selectUnitSlot();
+	void refreshSlot();
 	void clickedOk();
 	void viewHelp();
 	void aboutQt();
