@@ -27,6 +27,7 @@ public:
 	/* Методы QAbstractItemModel, которые необходимо переопределять 
 	 * в классе-потомке*/
 	Qt::ItemFlags flags(const QModelIndex &index) const;
+	bool setData(const QModelIndex &index, const QVariant &value, int role);
 	QVariant data(const QModelIndex &index, int role) const;
 	QVariant headerData(int section, Qt::Orientation, int role) const;
 	int rowCount(const QModelIndex&) const;

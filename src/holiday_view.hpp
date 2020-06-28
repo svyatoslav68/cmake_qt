@@ -7,7 +7,13 @@
 #define MYTABLEVIEW_HPP
 
 #include <QTableView>
-class QWidget;
+#include <QWidget>
+
+class GraphicsWidget : public QWidget {
+Q_OBJECT
+protected:
+	void paintEvent(QPaintEvent *event);
+};
 
 class HolidayView : public QTableView{
 public:

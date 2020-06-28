@@ -82,7 +82,6 @@ HolidayTableModel::HolidayTableModel():
 			row = mysql_fetch_row(data_from_BD);
 		}
 	}
-
 }
 
 HolidayTableModel::~HolidayTableModel(){
@@ -95,8 +94,9 @@ Qt::ItemFlags HolidayTableModel::flags(const QModelIndex &index) const{
 	Qt::ItemFlags theFlags;// = QAbstractItemModel::flags(index);
 	if (index.isValid()){
 		theFlags |= Qt::ItemIsEnabled;
+		theFlags |= Qt::ItemIsSelectable;
 		if(index.column() != Holidays)
-			theFlags |= Qt::ItemIsSelectable;
+			theFlags |= Qt::ItemIsEditable;
 	}
 	return theFlags;
 }
@@ -165,3 +165,8 @@ QModelIndex HolidayTableModel::parent ( const QModelIndex & ) const
 {
 	return QModelIndex();
 }
+
+bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+}
+

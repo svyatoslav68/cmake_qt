@@ -21,9 +21,12 @@ public:
 	explicit HolidayDelegate(const int year_days, const int scale = 2, const bool back_ground = true, QObject *parent = nullptr)
 					:QStyledItemDelegate(parent), _year_days(year_days),
 					_scale(scale), _back_ground(back_ground) {}
+	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 	void paint(QPainter *painter, 
 				const QStyleOptionViewItem &option,
 				const QModelIndex &index) const;
+	void setEditorData(QWidget *editor, const QModelIndex &index) const;
 private:
 	const static char *template_name_file_background; 
 	const int _year_days;

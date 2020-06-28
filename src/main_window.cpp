@@ -109,7 +109,7 @@ void MainWindow::createActions()
 	actConditions->setShortcut(QKeySequence("CTRL-U"));
 	connect(actConditions, SIGNAL(triggered()), this, SLOT(dialogConditions()));
 	actUnit = new QAction("Подразделение");
-	connect(actUnit, SIGNAL(triggered()), this, SLOT(refreshSlot()));
+	connect(actUnit, SIGNAL(triggered()), this, SLOT(selectUnitSlot()));
 	actSetColors = new QAction("Цвета");
 	actHelpApplication = new QAction("Помощь", this);
 	actHelpApplication->setObjectName("actHelpApplication");

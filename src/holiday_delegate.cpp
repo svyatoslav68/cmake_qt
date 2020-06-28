@@ -15,9 +15,11 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include "holiday_delegate.hpp"
 #include "holiday_table_model.hpp"
+#include "holiday_view.hpp"
 #include "365x1.xpm"
 
 const char *HolidayDelegate::template_name_file_background = "./BackGround_%d.png";		
+
 
 void HolidayDelegate::paint(QPainter *painter, 
 				const QStyleOptionViewItem &option,
@@ -64,3 +66,19 @@ void HolidayDelegate::paint(QPainter *painter,
 	//painter->drawText(option.rect, Qt::AlignCenter, tmp_holidays);
 }
 
+QWidget *HolidayDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	std::cout << "Create editor.\n";
+	GraphicsWidget *widget = new GraphicsWidget();
+	return widget;
+}
+
+void HolidayDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    editor->setGeometry(option.rect);
+}
+
+void HolidayDelegate::setEditorData(QWidget *editor,
+                                    const QModelIndex &index) const
+{
+}
