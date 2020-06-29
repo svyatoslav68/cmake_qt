@@ -11,6 +11,7 @@
 #include <QModelIndex>
 #include <QImage>
 #include <QPixmap>
+#include <QRect>
 #include <boost/format.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include "holiday_delegate.hpp"
@@ -68,8 +69,8 @@ void HolidayDelegate::paint(QPainter *painter,
 
 QWidget *HolidayDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	std::cout << "Create editor.\n";
-	GraphicsWidget *widget = new GraphicsWidget();
+	//std::cout << "Create editor.\n";
+	GraphicsWidget *widget = new GraphicsWidget(_scale, parent);
 	return widget;
 }
 
@@ -81,4 +82,14 @@ void HolidayDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionVi
 void HolidayDelegate::setEditorData(QWidget *editor,
                                     const QModelIndex &index) const
 {
+	if (index.column() == HolidayTableModel::Holidays){
+		std::vector<QRect> holidays;
+		QList<QVariant> list_from_model = index.model()->data(index, Qt::EditRole).toList();
+		for (auto &elem : list_from_model){
+			QRect rect(elem.toMap()["begin"].toInt()*_scale, 4, elem.toMap()["duration"].toInt()*_scale+elem.toMap()["travel"].toInt()*_scale, 20);
+			holidays.push_back(rect);
+		}
+		GraphicsWidget *graphicEditor = static_cast<GraphicsWidget *>(editor);
+		graphicEditor->setHolidays(holidays);
+	}
 }

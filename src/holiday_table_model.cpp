@@ -95,7 +95,7 @@ Qt::ItemFlags HolidayTableModel::flags(const QModelIndex &index) const{
 	if (index.isValid()){
 		theFlags |= Qt::ItemIsEnabled;
 		theFlags |= Qt::ItemIsSelectable;
-		if(index.column() != Holidays)
+		if(index.column() == Holidays)
 			theFlags |= Qt::ItemIsEditable;
 	}
 	return theFlags;
