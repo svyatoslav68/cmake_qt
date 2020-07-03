@@ -168,5 +168,14 @@ QModelIndex HolidayTableModel::parent ( const QModelIndex & ) const
 
 bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+	if (!index.isValid() || role != Qt::EditRole || 
+		index.column() != Holidays || index.row() < 0 || index.row() > content.size())
+		return false;
+	std::string FIO = content.at(index.row()+1).first;
+	vector<THoliday> *vec = content.at(index.row()+1).second;
+	pair<std::string, vector<THoliday>*> p(FIO, vec);
+	content[index.row()+1] = p;
+	emit dataChanged(index, index);
+	return true;
 }
 

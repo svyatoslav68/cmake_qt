@@ -15,6 +15,11 @@ void GraphicsWidget::setHolidays(const std::vector<QRect> &holidays)
 	_rectsHoliday = holidays;
 }
 
+std::vector<QRect> GraphicsWidget::getHolidays()
+{
+	return _rectsHoliday;
+}
+
 void GraphicsWidget::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
@@ -32,6 +37,10 @@ void GraphicsWidget::keyPressEvent(QKeyEvent *event)
 			break;
 		case Qt::Key_Right:
 			_rectsHoliday[_currentHoliday].moveRight(_rectsHoliday[_currentHoliday].right()+_scale);
+			break;
+		case Qt::Key_Up:
+			_currentHoliday = ++_currentHoliday%_rectsHoliday.size();
+			std::cout << "current holiday: " << _currentHoliday << std::endl;
 			break;
 		default:
 			QWidget::keyPressEvent(event);

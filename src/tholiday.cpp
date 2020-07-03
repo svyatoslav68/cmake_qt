@@ -53,6 +53,11 @@ THoliday& THoliday::operator-(int numdays){
 	return *this;
 }
 
+THoliday& THoliday::move(int number_days)
+{
+	date_begin += bdd(number_days);
+}
+
 bt THoliday::beginDate() const{
 	return date_begin;
 }

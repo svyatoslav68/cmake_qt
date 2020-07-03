@@ -39,7 +39,10 @@ private:
 	const std::string Template_SQL_Holidays;
 	//HolidayTableModel(){};
 	static const int COLUMN_COUNT = 3;
-	std::map<int, std::pair<std::string, std::vector<THoliday>*>> content;
+	std::map<int, // Number row in table
+	std::pair<std::string, // FIO
+	std::vector<THoliday>* //pointer on vector holidays
+	>> content;
 };
 
   

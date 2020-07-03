@@ -27,6 +27,8 @@ public:
 				const QStyleOptionViewItem &option,
 				const QModelIndex &index) const;
 	void setEditorData(QWidget *editor, const QModelIndex &index) const;
+	void setModelData(QWidget *editor, QAbstractItemModel *model,
+						const QModelIndex &index) const;
 private:
 	const static char *template_name_file_background; 
 	const int _year_days;

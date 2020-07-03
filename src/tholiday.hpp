@@ -26,6 +26,7 @@ public:
 				cod_holiday(_cod_holiday), cod_person(_cod_person), date_begin(boost::gregorian::from_simple_string(std::string(s_date))), holiday_duration(boost::gregorian::date_duration(duration)), travel_duration(boost::gregorian::date_duration(travel_duration)),  name_holiday(_name_holiday){};
 	THoliday& operator+(int numdays);
 	THoliday& operator-(int numdays);
+	THoliday& move(int number_days); // +x - move to next date, -x - to prev date
 	bt beginDate() const;
 	int firstDay ()const;
 	int numberDaysHoliday() const;

@@ -93,3 +93,14 @@ void HolidayDelegate::setEditorData(QWidget *editor,
 		graphicEditor->setHolidays(holidays);
 	}
 }
+
+void HolidayDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+									const QModelIndex &index) const
+{
+	GraphicsWidget *graphicEditor = static_cast<GraphicsWidget *>(editor);
+	std::vector<QRect> vec = graphicEditor->getHolidays();
+	for(auto elem : vec){
+		std::cout << "begin=" << elem.left() << "; end=" << elem.right() << std::endl;
+	}
+}
+
