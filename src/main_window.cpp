@@ -49,15 +49,14 @@ void MainWindow::createModelAndView(){
 		delete holidayModel;
 	holidayModel = new HolidayTableModel();
 	int year = appParametrs.getYear();
-	int year_days = 365 + static_cast<int>((year % 4 == 0 && year % 100 != 0)||(year % 400 == 0));
 	if (mainView)
 		delete mainView;
-	mainView = new HolidayView(this, year_days, scale);//QGraphicsView();
+	mainView = new HolidayView(year, this, scale);//QGraphicsView();
 	mainView->setModel(holidayModel);
 	mainView->setSizeColumns();
 	if (graphicDelegate)
 		delete graphicDelegate;
-	graphicDelegate = new HolidayDelegate(year_days, scale, actBackGround->isChecked());
+	graphicDelegate = new HolidayDelegate(year, scale, actBackGround->isChecked());
 	mainView->setItemDelegateForColumn(2, graphicDelegate);
 	setCentralWidget(mainView);
 	int tableWidth = 70, tableHeight = 50;

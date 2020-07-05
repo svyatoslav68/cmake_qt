@@ -48,13 +48,14 @@ void GraphicsWidget::keyPressEvent(QKeyEvent *event)
 	update();
 }
 
-HolidayView::HolidayView(QWidget *parent, const int days_in_year, const int scale):QTableView(parent), _year_days(days_in_year), _scale(scale)
+HolidayView::HolidayView(const int year, QWidget *parent, const int scale):QTableView(parent), _year(year), _scale(scale)
 {
 }
 
 void HolidayView::setSizeColumns(){
 	setColumnWidth(HolidayTableModel::Number, 50);
 	setColumnWidth(HolidayTableModel::FIO, 150);
-	setColumnWidth(HolidayTableModel::Holidays, _scale*_year_days);
+	int year_days = 365 + static_cast<int>((_year % 4 == 0 && _year % 100 != 0)||(_year % 400 == 0));
+	setColumnWidth(HolidayTableModel::Holidays, _scale*year_days);
 }
 

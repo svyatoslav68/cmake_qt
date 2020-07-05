@@ -27,8 +27,10 @@ public:
 	THoliday& operator+(int numdays);
 	THoliday& operator-(int numdays);
 	THoliday& move(int number_days); // +x - move to next date, -x - to prev date
+	THoliday& moveTo(int dayInYear);
 	bt beginDate() const;
 	int firstDay ()const;
+	void setBeginDate(bt newDate){date_begin = newDate;}
 	int numberDaysHoliday() const;
 	int numberDaysTravel() const;
 	void displayHoliday() const;

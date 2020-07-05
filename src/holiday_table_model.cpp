@@ -168,11 +168,20 @@ QModelIndex HolidayTableModel::parent ( const QModelIndex & ) const
 
 bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+	using namespace boost::gregorian;
 	if (!index.isValid() || role != Qt::EditRole || 
 		index.column() != Holidays || index.row() < 0 || index.row() > content.size())
 		return false;
 	std::string FIO = content.at(index.row()+1).first;
 	vector<THoliday> *vec = content.at(index.row()+1).second;
+	QVector<QVariant> vectorOfBeginHolidays = value.toList().toVector();
+	int i = 0;
+	date firstDayYear = date(appParametrs.getYear(), Jan, 1);
+	for (auto &holiday : *vec) {
+		date_duration dd(vectorOfBeginHolidays[i++].toInt());
+		holiday.setBeginDate(firstDayYear + dd);
+		std::cout << "begin = " << holiday.beginDate() << std::endl;
+	}
 	pair<std::string, vector<THoliday>*> p(FIO, vec);
 	content[index.row()+1] = p;
 	emit dataChanged(index, index);

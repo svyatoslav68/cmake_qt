@@ -27,10 +27,10 @@ protected:
 
 class HolidayView : public QTableView{
 public:
-	explicit HolidayView(QWidget *parent = nullptr, const int days_in_year = 365, const int scale = 2);
+	explicit HolidayView(const int year, QWidget *parent = nullptr, const int scale = 2);
 	void setSizeColumns();
 private:
-	const int _year_days;
+	const int _year;
 	const int _scale;
 };
 

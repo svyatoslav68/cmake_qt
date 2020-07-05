@@ -56,6 +56,7 @@ THoliday& THoliday::operator-(int numdays){
 THoliday& THoliday::move(int number_days)
 {
 	date_begin += bdd(number_days);
+	return *this;
 }
 
 bt THoliday::beginDate() const{
@@ -79,4 +80,8 @@ std::set<bt> THoliday::datesHoliday(){
 	return result;
 }
 
+THoliday &THoliday::moveTo(int dayInYear)
+{
+
+}
 

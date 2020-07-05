@@ -18,8 +18,8 @@ class QObject;
 class HolidayDelegate : public QStyledItemDelegate {
 	Q_OBJECT
 public:
-	explicit HolidayDelegate(const int year_days, const int scale = 2, const bool back_ground = true, QObject *parent = nullptr)
-					:QStyledItemDelegate(parent), _year_days(year_days),
+	explicit HolidayDelegate(const int year, const int scale = 2, const bool back_ground = true, QObject *parent = nullptr)
+					:QStyledItemDelegate(parent), _year(year),
 					_scale(scale), _back_ground(back_ground) {}
 	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
@@ -31,7 +31,7 @@ public:
 						const QModelIndex &index) const;
 private:
 	const static char *template_name_file_background; 
-	const int _year_days;
+	const int _year;
 	const int _scale;
 	const bool _back_ground;
 };
