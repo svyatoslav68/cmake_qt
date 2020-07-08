@@ -32,6 +32,8 @@ public:
 private:
 	const int _year;
 	const int _scale;
+protected:
+	void keyPressEvent(QKeyEvent *event);
 };
 
 #endif //MYTABLEVIEW_HPP

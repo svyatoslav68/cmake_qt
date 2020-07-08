@@ -59,3 +59,13 @@ void HolidayView::setSizeColumns(){
 	setColumnWidth(HolidayTableModel::Holidays, _scale*year_days);
 }
 
+void HolidayView ::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key()) {
+	case Qt::Key_Up:
+		std::cout << "Press Up\n";	
+		break;
+	default:
+		QTableView::keyPressEvent(event);
+	}
+}

@@ -24,7 +24,8 @@ const char *HolidayDelegate::template_name_file_background = "./BackGround_%d.pn
 
 void HolidayDelegate::paint(QPainter *painter, 
 				const QStyleOptionViewItem &option,
-				const QModelIndex &index) const{
+				const QModelIndex &index) const
+{
 	//using namespace boost::gregorian;
 	const HolidayTableModel *model = 
 			qobject_cast<const HolidayTableModel *>(index.model());
@@ -61,7 +62,7 @@ void HolidayDelegate::paint(QPainter *painter,
 		//painter->setBrush(Qt::LinearGradientPattern);
 		painter->setPen(Qt::darkGreen);
 		painter->setBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
-		painter->drawRect(option.rect.x()+elem.toMap()["begin"].toInt()*_scale, option.rect.y()+4, 1+elem.toMap()["duration"].toInt()*_scale, 20);
+		painter->drawRect(option.rect.x()+elem.toMap()["begin"].toInt()*_scale, option.rect.y()+4, /*1+*/elem.toMap()["duration"].toInt()*_scale, 20);
 		painter->setBrush(QBrush(Qt::blue, Qt::SolidPattern));
 		painter->drawRect(option.rect.x()+elem.toMap()["begin"].toInt()*_scale+elem.toMap()["duration"].toInt()*_scale, option.rect.y()+4, elem.toMap()["travel"].toInt()*_scale, 20);
 	}
@@ -87,7 +88,7 @@ void HolidayDelegate::setEditorData(QWidget *editor,
 		std::vector<QRect> holidays;
 		QList<QVariant> list_from_model = index.model()->data(index, Qt::EditRole).toList();
 		for (auto &elem : list_from_model){
-			QRect rect(elem.toMap()["begin"].toInt()*_scale, 4, 1+elem.toMap()["duration"].toInt()*_scale+elem.toMap()["travel"].toInt()*_scale, 20);
+			QRect rect(elem.toMap()["begin"].toInt()*_scale, 4, /*1+*/elem.toMap()["duration"].toInt()*_scale+elem.toMap()["travel"].toInt()*_scale, 20);
 			holidays.push_back(rect);
 		}
 		GraphicsWidget *graphicEditor = static_cast<GraphicsWidget *>(editor);
@@ -102,8 +103,8 @@ void HolidayDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	std::vector<QRect> vec = graphicEditor->getHolidays();
 	QList<QVariant> listOfBeginHolidays;
 	for(auto elem : vec){
-		std::cout << "begin=" << elem.left()/_scale << "; end=" << elem.right()/_scale << std::endl;
-		listOfBeginHolidays.append(elem.left()/_scale);
+		//std::cout << "begin=" << elem.left()/_scale << "; end=" << elem.right()/_scale << std::endl;
+		listOfBeginHolidays.append(elem.left()/_scale - 1);
 	}
 	model->setData(index, QVariant(listOfBeginHolidays), Qt::EditRole);
 }
