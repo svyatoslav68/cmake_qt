@@ -21,6 +21,7 @@ private:
 	std::vector<QRect> _rectsHoliday;
 	int _currentHoliday;
 protected:
+	bool event(QEvent *e);
 	void paintEvent(QPaintEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 };
@@ -33,6 +34,7 @@ private:
 	const int _year;
 	const int _scale;
 protected:
+	//bool event(QEvent *e);
 	void keyPressEvent(QKeyEvent *event);
 };
 

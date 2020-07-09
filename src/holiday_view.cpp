@@ -28,6 +28,20 @@ void GraphicsWidget::paintEvent(QPaintEvent *event)
 	painter.drawRect(_rectsHoliday[_currentHoliday]); 
 }
 
+bool GraphicsWidget::event(QEvent *e)
+{
+	if (e->type() == QEvent::KeyPress){
+		std::cout << "Press Tab\n";	
+		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
+		if (keyEvent->key() == Qt::Key_Tab){
+			std::cout << "Press Tab\n";	
+			_currentHoliday = ++_currentHoliday%_rectsHoliday.size();
+			return true;
+		}
+	}
+	return QWidget::event(e);
+}
+
 void GraphicsWidget::keyPressEvent(QKeyEvent *event)
 {
 	//QRect rect = _rectsHoliday[_currentHoliday];
@@ -58,6 +72,19 @@ void HolidayView::setSizeColumns(){
 	int year_days = 365 + static_cast<int>((_year % 4 == 0 && _year % 100 != 0)||(_year % 400 == 0));
 	setColumnWidth(HolidayTableModel::Holidays, _scale*year_days);
 }
+
+/*bool HolidayView::event(QEvent *e)
+{
+	if (e->type() == QEvent::KeyPress){
+		std::cout << "From HolidayView Press Tab\n";	
+		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
+		if (keyEvent->key() == Qt::Key_Tab){
+			std::cout << "Press Tab\n";	
+			return true;
+		}
+	}
+	return QWidget::event(e);
+}*/
 
 void HolidayView ::keyPressEvent(QKeyEvent *event)
 {
