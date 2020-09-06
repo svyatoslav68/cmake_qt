@@ -3,50 +3,8 @@
  ****        файл holiday_view .cpp                     *****
  *********************************************************/
 #include <QHeaderView>
-#include <QPen>
-#include <QBrush>
-#include <QPainter>
-#include <QKeyEvent>
 #include "holiday_table_model.hpp"
 #include "holiday_view.hpp"
-
-void GraphicsWidget::setHolidays(const std::vector<QRect> &holidays)
-{
-	_rectsHoliday = holidays;
-}
-
-std::vector<QRect> GraphicsWidget::getHolidays()
-{
-	return _rectsHoliday;
-}
-
-void GraphicsWidget::paintEvent(QPaintEvent *event)
-{
-	QPainter painter(this);
-	painter.setPen(QPen(Qt::blue, Qt::SolidLine));
-	painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-	painter.drawRect(_rectsHoliday[_currentHoliday]); 
-}
-
-void GraphicsWidget::keyPressEvent(QKeyEvent *event)
-{
-	//QRect rect = _rectsHoliday[_currentHoliday];
-	switch (event->key()) {
-		case Qt::Key_Left:
-			_rectsHoliday[_currentHoliday].moveLeft(_rectsHoliday[_currentHoliday].left()-_scale);
-			break;
-		case Qt::Key_Right:
-			_rectsHoliday[_currentHoliday].moveRight(_rectsHoliday[_currentHoliday].right()+_scale);
-			break;
-		case Qt::Key_Up:
-			_currentHoliday = ++_currentHoliday%_rectsHoliday.size();
-			std::cout << "current holiday: " << _currentHoliday << std::endl;
-			break;
-		default:
-			QWidget::keyPressEvent(event);
-	}
-	update();
-}
 
 HolidayView::HolidayView(const int year, QWidget *parent, const int scale):QTableView(parent), _year(year), _scale(scale)
 {

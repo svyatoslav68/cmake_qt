@@ -15,8 +15,11 @@
 #include <QModelIndex>
 #include <QStringListModel>
 #include <QLineEdit>
+#include <QComboBox>
+#include <QSpinBox>
 #include <QStringList>
 #include <QtDebug>
+#include <tuple>
 #include <QHeaderView>
 #include "cl_parametrs.hpp"
 #include "person_model.hpp"
@@ -33,6 +36,7 @@ DialogConditions::DialogConditions(QWidget *parent):QDialog(parent){
 	groupsModel = new ModelGroups(this);
 	groupsModel->loadFromXML();
 	membersModel = nullptr;
+	conditionsModel = nullptr;
 	createWidgets();
 }
 
@@ -44,6 +48,9 @@ DialogConditions::~DialogConditions(){
 	delete buDelete;
 	delete buAddCondition;
 	delete buDeleteCondition;
+	delete viewConditions;
+	delete spCondition;
+	delete cbCondition;
 	delete viewTablePersons;
 	delete viewListContentGroup;
 	delete laContentGroup;
@@ -52,6 +59,7 @@ DialogConditions::~DialogConditions(){
 	delete buSave;
 	delete personModel;
 	delete membersModel;
+	delete conditionsModel;
 	delete groupsModel;
 }
 
@@ -73,6 +81,17 @@ void DialogConditions::createWidgets(){
 	laContentGroup = new QLabel("Члены группы:");
 	viewListContentGroup = new QListView();
 	viewListContentGroup->setObjectName("viewListContentGroup");
+	connect(viewListContentGroup, SIGNAL(clicked(const QModelIndex &)), this, SLOT(changeIndexMember(const QModelIndex &)));
+	QLabel *laCondition = new QLabel("Условия:"); 
+	viewConditions = new QListView();
+	viewConditions->setObjectName("viewConditions");
+	QStringList lstConditions;
+	lstConditions << "<" << "=" << ">";
+	cbCondition = new QComboBox();
+	cbCondition->setObjectName("cbCondition");
+	cbCondition->addItems(lstConditions);
+	spCondition = new QSpinBox();
+	spCondition->setMinimum(0);
 	QLabel *laGroups = new QLabel("Список групп");
 	viewListGroups = new QListView();
 	viewListGroups->setModel(groupsModel);
@@ -100,28 +119,50 @@ void DialogConditions::createWidgets(){
 	groupLayout->addWidget(viewListGroups);
 	groupLayout->addLayout(editGroupLayout);
 	buAppend = new QPushButton("Добавить члена");
+	buAppend->setEnabled(false);
 	connect(buAppend, SIGNAL(clicked()), this, SLOT(addMemberSlot()));
 	buDelete = new QPushButton("Удалить члена");
+	buDelete->setEnabled(false);
 	connect(buDelete, SIGNAL(clicked()), this, SLOT(deleteMemberSlot()));
-	buAddCondition = new QPushButton("Добавить условие");
-	buDeleteCondition = new QPushButton("Убрать условие");
+	buAddCondition = new QPushButton("+");
+	buAddCondition->setFlat(true);
+	buAddCondition->setMaximumHeight(40);
+	buAddCondition->setMaximumWidth(40);
+	buAddCondition->setEnabled(false);
+	connect(buAddCondition, &QPushButton::clicked, this, [this](){this->addCondition();});
+	buDeleteCondition = new QPushButton("-");
+	buDeleteCondition->setFlat(true);
+	buDeleteCondition->setMaximumHeight(40);
+	buDeleteCondition->setMaximumWidth(40);
+	buDeleteCondition->setEnabled(false);
+	connect(buDeleteCondition, &QPushButton::clicked, this, [this](){this->deleteCondition();});
+	QHBoxLayout *editConditionLayout = new QHBoxLayout;
+	editConditionLayout->setSpacing(0);
+	editConditionLayout->addWidget(cbCondition);
+	editConditionLayout->addWidget(spCondition);
+	editConditionLayout->addStretch();
+	editConditionLayout->addWidget(buAddCondition);
+	editConditionLayout->addWidget(buDeleteCondition);
 	QVBoxLayout *contentLayout = new QVBoxLayout();
 	contentLayout->addWidget(laContentGroup, 0);
-	contentLayout->addWidget(viewListContentGroup, 1);
+	contentLayout->addWidget(viewListContentGroup, 2);
+	//QHBoxLayout *conditionLayout = new QHBoxLayout;
+	contentLayout->addWidget(laCondition, 0);
+	contentLayout->addWidget(viewConditions, 1);
+	//contentLayout->addLayout(conditionLayout);
+	contentLayout->addLayout(editConditionLayout);
 	QVBoxLayout *controlLayout = new QVBoxLayout;
 	controlLayout->addStretch();
 	controlLayout->addWidget(buAppend);
 	controlLayout->addWidget(buDelete);
-	controlLayout->addWidget(buAddCondition);
-	controlLayout->addWidget(buDeleteCondition);
 	controlLayout->addStretch();
 	QHBoxLayout *topLayout = new QHBoxLayout;
 	topLayout->addLayout(groupLayout);
 	topLayout->addLayout(controlLayout);
 	topLayout->addLayout(contentLayout);
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->addLayout(topLayout);
-	mainLayout->addWidget(viewTablePersons);
+	mainLayout->addLayout(topLayout, 1);
+	mainLayout->addWidget(viewTablePersons, 3);
 	mainLayout->addLayout(bottomLayout);
 	setLayout(mainLayout);
 }
@@ -133,15 +174,26 @@ void DialogConditions::saveConfiguration(){
 	ValuesFromXML vx = ValuesFromXML(appParametrs.getNameConfFile().c_str());
 	/* Создаем вектор пар. Первое значение - имя группы, второе -
 	вектор численных идентификаторов членов группы */
-	std::vector<std::pair<std::string, std::vector<int>>> vector_groups;
+	std::vector<std::tuple<std::string, std::vector<int>, std::vector<std::pair<std::string, int>>>> vector_groups;
 	for (auto group: groupsModel->getMembers()){
 		//std::cout << str.toStdString() << std::endl;
 		std::vector<int> vector_members;
+		std::vector<std::pair<std::string, int>> vector_conditions;
 		//vectorString.push_back(group.name.toStdString());
 		for (auto member: *group.children){
 			vector_members.push_back(member.idBD);
 		}
-		vector_groups.push_back(std::pair(group.name, vector_members));
+		for (auto condition: *group.conditions){
+			std::string word_condition;
+			switch (condition.symbol_functor){
+				case '>':word_condition = "great";break;
+				case '<':word_condition = "less";break;
+				case '=':word_condition = "equal";break;
+				default: word_condition = "";
+			}
+			vector_conditions.push_back(std::make_pair(word_condition, condition.number_members));
+		}
+		vector_groups.push_back(std::tuple(group.name, vector_members, vector_conditions));
 	}
 	vx.saveGroups("FILE.Groups", vector_groups);
 }
@@ -158,12 +210,23 @@ void DialogConditions::deleteGroup(){
 
 void DialogConditions::changeIndexGroup(const QModelIndex &index){
 	//std::cout <<"Current group = " << index.model()->data(index).toString().toStdString() << std::endl;
+	buAppend->setEnabled(viewListGroups->currentIndex().isValid());
+	buDelete->setEnabled(viewListGroups->currentIndex().isValid() and viewListContentGroup->currentIndex().isValid());
+	buAddCondition->setEnabled(viewListGroups->currentIndex().isValid());
+	buDeleteCondition->setEnabled(viewListGroups->currentIndex().isValid());
 	laContentGroup->setText(QString("Члены группы %1:").arg(index.model()->data(index).toString()));
 	if (membersModel)
 		delete membersModel;
 	membersModel = new ModelMembersGroup(this, static_cast<ItemOfGroup *>(index.internalPointer())->children);
 	viewListContentGroup->setModel(membersModel);
-	//viewListContentGroup->setModel();
+	if (conditionsModel)
+		delete conditionsModel;
+	conditionsModel = new ModelConditionsGroup(this, static_cast<ItemOfGroup *>(index.internalPointer())->conditions);
+	viewConditions->setModel(conditionsModel);
+}
+
+void DialogConditions::changeIndexMember(const QModelIndex &index){
+	buDelete->setEnabled(viewListGroups->currentIndex().isValid() and viewListContentGroup->currentIndex().isValid());
 }
 
 void DialogConditions::addMemberSlot(){
@@ -177,6 +240,22 @@ void DialogConditions::addMemberSlot(){
 void DialogConditions::deleteMemberSlot(){
 	if (membersModel){
 		membersModel->removeRows(viewListContentGroup->currentIndex().row(), 1);
+	}
+}
+
+void DialogConditions::addCondition()
+{
+	if (conditionsModel) {
+		conditionsModel->insertRows(conditionsModel->rowCount(), 1);
+		QList<QVariant> values = {QVariant(cbCondition->itemText(cbCondition->currentIndex()).at(0).unicode()), QVariant(static_cast<unsigned int>(spCondition->value()))};
+		conditionsModel->setData(conditionsModel->index(conditionsModel->rowCount() - 1), QVariant(values));
+	}
+}
+
+void DialogConditions::deleteCondition()
+{ // FIXME, не рабоатает segmentation fault !!!
+	if (conditionsModel) {
+		conditionsModel->removeRows(viewConditions->currentIndex().row(), 1);
 	}
 }
 

@@ -16,6 +16,22 @@
 
 extern clParametrs appParametrs; 
 
+ConditionOfGroup::ConditionOfGroup(std::pair<std::string, int> condition, ItemOfGroup *_parent):number_members(condition.second), parent(_parent){
+	if (condition.first == "great"){
+		symbol_functor = '>';
+		return;
+	}
+	if (condition.first == "less"){
+		symbol_functor = '<';
+		return;
+	}
+	if (condition.first == "equal"){
+		symbol_functor = '=';
+		return;
+	}
+}
+
+
 MemberGroup::MemberGroup(int _idBD, ItemOfGroup *_parent):idBD(_idBD), parent(_parent){
 	TPerson person(_idBD);
 	name = person.getFamilyIO();
@@ -34,15 +50,18 @@ MemberGroup::~MemberGroup(){
 
 ItemOfGroup::ItemOfGroup(std::string _name):name(_name){
 		children = new std::vector<MemberGroup>;
+		conditions = new std::vector<ConditionOfGroup>;
 }
 
 ItemOfGroup::ItemOfGroup(const ItemOfGroup &group){
 	name = group.name;
 	children = new std::vector<MemberGroup>(group.children->begin(), group.children->end());
+	conditions = new std::vector<ConditionOfGroup>(group.conditions->begin(), group.conditions->end());
 	//copy(group.children->begin(), group.children->end(), children->begin());
 }
 
 ItemOfGroup::~ItemOfGroup(){
+	delete conditions;
 	delete children;
 }
 
@@ -121,6 +140,10 @@ int ModelGroups::loadFromXML(){
 			//std::cout << "Create member " << item_member.name << std::endl;
 			item_group.children->push_back(item_member);
 		}
+		for (auto pair_condition : vx.getConditionsGroup("FILE.Groups", name_group)){
+			ConditionOfGroup item_condition(pair_condition, &item_group);
+			item_group.conditions->push_back(item_condition);
+		}
 		/* Присваиваем соотвествующему полю указатель на вектор списка членов */
 		members.push_back(item_group);
 	}
@@ -156,6 +179,9 @@ QVariant ModelMembersGroup::data(const QModelIndex &index, int role) const{
 	if (role == Qt::DisplayRole){
 		return members->at(index.row()).name.c_str();
 	}
+	if (role == Qt::UserRole) {
+		return QVariant();
+	}
 	return QVariant();
 }
 
@@ -190,3 +216,67 @@ bool ModelMembersGroup::setData(const QModelIndex &index, const QVariant &value,
 	emit dataChanged(index, index);
 	return true;
 }
+
+Qt::ItemFlags ModelConditionsGroup::flags(const QModelIndex &index) const {
+	Qt::ItemFlags theFlags;
+	if (index.isValid()){
+		theFlags |= Qt::ItemIsEnabled| Qt::ItemIsSelectable;
+	}
+	return theFlags;
+}
+
+QModelIndex ModelConditionsGroup::index(int row, int column, const QModelIndex &parent) const {
+	if (row < 0 || column != 0)
+		return QModelIndex();
+	/* Указатель на ConditionOfGroup группы передаем в возвращаемый индекс */
+	ConditionOfGroup *condition = const_cast<ConditionOfGroup *>(&conditions->at(row));
+	return createIndex(row, column, condition); 
+}
+
+QModelIndex ModelConditionsGroup::parent(const QModelIndex &child) const {
+	return QModelIndex();
+}
+
+QVariant ModelConditionsGroup::data(const QModelIndex &index, int role) const {
+	if (!index.isValid() || index.row() < 0 || index.row() > conditions->size())
+		return QVariant();
+	if (role == Qt::DisplayRole){
+		ConditionOfGroup con = conditions->at(index.row());
+		QString strCondition = QString("%1 %2").arg(con.symbol_functor).arg(con.number_members);
+		return QVariant(strCondition);
+	}
+	return QVariant();
+}
+
+bool ModelConditionsGroup::setData(const QModelIndex &index, const QVariant &value, int role) {
+	if (!index.isValid() || index.row() < 0 || index.row() > conditions->size())
+		return false;
+	ConditionOfGroup &condition = conditions->at(index.row());
+	condition.symbol_functor = value.toList()[0].toChar().unicode();
+	condition.number_members = value.toList()[1].toInt();
+	emit dataChanged(index, index);
+	return true;
+}
+
+int ModelConditionsGroup::rowCount(const QModelIndex &index) const{
+	return conditions->size();
+}
+
+bool ModelConditionsGroup::insertRows(int row, int count, const QModelIndex &parent){
+	beginInsertRows(QModelIndex(), row, row+count-1);
+	auto it = conditions->cbegin();
+	conditions->insert(it+row, count, ConditionOfGroup());
+	endInsertRows();
+	return true;
+}
+
+bool ModelConditionsGroup::removeRows(int row, int count, const QModelIndex &parent){
+	beginRemoveRows(QModelIndex(), row, row+count-1);
+	auto it = conditions->cbegin();
+	for (int i = 0; i < count; ++i){
+		conditions->erase(it+row);
+	}
+	endRemoveRows();
+	return true;
+}
+

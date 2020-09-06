@@ -174,13 +174,16 @@ bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value,
 		return false;
 	std::string FIO = content.at(index.row()+1).first;
 	vector<THoliday> *vec = content.at(index.row()+1).second;
-	QVector<QVariant> vectorOfBeginHolidays = value.toList().toVector();
+	QVector<QVariant> vectorOfRectHolidays = value.toList().toVector();
 	int i = 0;
 	date firstDayYear = date(appParametrs.getYear(), Jan, 1);
 	for (auto &holiday : *vec) {
-		date_duration dd(vectorOfBeginHolidays[i++].toInt());
+		date_duration dd(vectorOfRectHolidays[i].toRect().left());
 		holiday.setBeginDate(firstDayYear + dd);
-		std::cout << "begin = " << holiday.beginDate() << std::endl;
+		date_duration hd(vectorOfRectHolidays[i].toRect().right() - vectorOfRectHolidays[i].toRect().left());
+		holiday.setHolidayDuration(hd);
+		++i;
+		//std::cout << "begin = " << holiday.beginDate() << std::endl;
 	}
 	pair<std::string, vector<THoliday>*> p(FIO, vec);
 	content[index.row()+1] = p;

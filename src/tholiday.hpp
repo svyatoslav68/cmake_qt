@@ -11,6 +11,7 @@
 #include "cl_parametrs.hpp"
 
 using bt=boost::gregorian::date;
+using bd=boost::gregorian::date_duration;
 
 
 class THoliday {
@@ -31,6 +32,7 @@ public:
 	bt beginDate() const;
 	int firstDay ()const;
 	void setBeginDate(bt newDate){date_begin = newDate;}
+	void setHolidayDuration(bd newHolidayDuration){holiday_duration = newHolidayDuration;}
 	int numberDaysHoliday() const;
 	int numberDaysTravel() const;
 	void displayHoliday() const;
@@ -40,8 +42,8 @@ private:
 	int cod_holiday;
 	int cod_person;
 	bt date_begin;	
-	boost::gregorian::date_duration holiday_duration;
-	boost::gregorian::date_duration travel_duration;
+	bd holiday_duration;
+	bd travel_duration;
 	std::string name_holiday;
 };
 #endif //THOLIDAY_HPP
