@@ -19,12 +19,12 @@ public:
 	THoliday(){};
 	THoliday(int _cod_holiday);
 	THoliday(	int _cod_holiday, 
-				int _cod_person, 
+				/*int _cod_person, */
 				std::string s_date, 
 				int duration, 
 				int travel_duration, 
 				std::string _name_holiday):
-				cod_holiday(_cod_holiday), cod_person(_cod_person), date_begin(boost::gregorian::from_simple_string(std::string(s_date))), holiday_duration(boost::gregorian::date_duration(duration)), travel_duration(boost::gregorian::date_duration(travel_duration)),  name_holiday(_name_holiday){};
+				cod_holiday(_cod_holiday), /*cod_person(_cod_person),*/ date_begin(boost::gregorian::from_simple_string(std::string(s_date))), holiday_duration(boost::gregorian::date_duration(duration)), travel_duration(boost::gregorian::date_duration(travel_duration)),  name_holiday(_name_holiday){};
 	THoliday& operator+(int numdays);
 	THoliday& operator-(int numdays);
 	THoliday& move(int number_days); // +x - move to next date, -x - to prev date
@@ -36,11 +36,12 @@ public:
 	int numberDaysHoliday() const;
 	int numberDaysTravel() const;
 	void displayHoliday() const;
-	std::set<bt> datesHoliday();
+	std::set<bt> datesHoliday() const;
+	std::set<int> numbersDayHoliday() const;
 private:
 	static const std::string templateSQLHoliday;
 	int cod_holiday;
-	int cod_person;
+	/*int cod_person;*/
 	bt date_begin;	
 	bd holiday_duration;
 	bd travel_duration;

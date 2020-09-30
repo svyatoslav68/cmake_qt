@@ -21,7 +21,7 @@ class HolidayTableModel: public QAbstractItemModel {
 	Q_OBJECT
 public:
 	enum Column {Number, FIO, Holidays};
-	HolidayTableModel(std::vector<std::string> persons);
+	/*HolidayTableModel(std::vector<std::string> persons);*/
 	HolidayTableModel();
 	~HolidayTableModel();
 	/* Методы QAbstractItemModel, которые необходимо переопределять 
@@ -34,15 +34,20 @@ public:
 	int columnCount(const QModelIndex&) const;
 	QModelIndex index ( int row, int column, const QModelIndex &) const;
 	QModelIndex parent ( const QModelIndex & ) const;
+	/*********************************************************************/
+	void fillConflicts(std::vector<int> changedRows);
 private:
 	const std::string Template_SQL_Fill;
 	const std::string Template_SQL_Holidays;
 	//HolidayTableModel(){};
 	static const int COLUMN_COUNT = 3;
 	std::map<int, // Number row in table
-	std::pair<std::string, // FIO
-	std::vector<THoliday>* //pointer on vector holidays
-	>> content;
+			std::tuple<int, // cod_person
+			std::string, // FIO
+			std::vector<THoliday>*, //pointer on vector holidays
+			std::set<boost::gregorian::date>* // Dates of conflicts
+				>> content;
+	std::vector<std::pair<std::vector<int>, int>> conditions;
 };
 
   

@@ -29,7 +29,7 @@ using namespace boost::gregorian;
 		MYSQL_ROW row;
 		row = mysql_fetch_row(data_from_BD);
 		name_holiday = row[1];
-		cod_person = boost::lexical_cast<int>(row[2]);		
+		/*cod_person = boost::lexical_cast<int>(row[2]);		*/
 		date_begin = from_simple_string(std::string(row[3]));
 		holiday_duration = date_duration(boost::lexical_cast<int>(row[4]));
 		travel_duration = date_duration(boost::lexical_cast<int>(row[5]));
@@ -75,10 +75,24 @@ int THoliday::numberDaysTravel() const{
 	return travel_duration.days();
 }
 
-std::set<bt> THoliday::datesHoliday(){
+std::set<bt> THoliday::datesHoliday() const{
+	using namespace boost::gregorian;
 	std::set<bt> result;
+	date_period holiday_period(date_begin, holiday_duration + travel_duration);
+	//std::cout << "holiday_period = " << holiday_period << std::endl;
+	day_iterator di(holiday_period.begin());
+	while (di != holiday_period.end()){
+		result.insert(*di);
+		++di;
+	}
 	return result;
 }
+
+std::set<int> THoliday::numbersDayHoliday() const{
+	using namespace boost::gregorian;
+
+}
+
 
 THoliday &THoliday::moveTo(int dayInYear)
 {

@@ -4,6 +4,9 @@
 ***********************************************************/
 #pragma once
 #include<QAbstractItemModel>
+#include <boost/date_time/gregorian/gregorian.hpp>
+
+using bt=boost::gregorian::date;
 
 struct ItemOfGroup;
 
@@ -37,6 +40,7 @@ struct ItemOfGroup {
 	std::string name;
 	std::vector<MemberGroup>  *children;
 	std::vector<ConditionOfGroup> *conditions;
+	std::vector<bt> getFailDates();
 };
 
 class ModelGroups : public QAbstractItemModel{
