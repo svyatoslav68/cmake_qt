@@ -4,8 +4,12 @@
 ***********************************************************/
 #pragma once
 #include<QAbstractItemModel>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include "tcondition.hpp"
 
-struct ItemOfGroup;
+using bt=boost::gregorian::date;
+
+//struct ItemOfGroup;
 
 struct ConditionOfGroup {
 	/* Класс условия для группы */
@@ -18,7 +22,7 @@ struct ConditionOfGroup {
 };
 
 struct MemberGroup {
-	/* Класс члена группы */
+	/* Класс сотрудника-члена группы */
 	MemberGroup():idBD(-1), name(""), parent(nullptr){}
 	MemberGroup(int _idBD, ItemOfGroup *_parent = nullptr);
 	MemberGroup(int _idBD, std::string _name, ItemOfGroup *_parent = nullptr):idBD(_idBD), name(_name), parent(_parent){}
@@ -30,14 +34,6 @@ struct MemberGroup {
 	ItemOfGroup *parent;
 };
 
-struct ItemOfGroup {
-	ItemOfGroup(std::string _name);
-	ItemOfGroup(const ItemOfGroup &);
-	~ItemOfGroup();
-	std::string name;
-	std::vector<MemberGroup>  *children;
-	std::vector<ConditionOfGroup> *conditions;
-};
 
 class ModelGroups : public QAbstractItemModel{
 	/* Модель содержит группы сотрудников */

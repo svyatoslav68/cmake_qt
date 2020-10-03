@@ -60,16 +60,20 @@ void HolidayDelegate::paint(QPainter *painter,
 		//tmp_holidays+=QString::number(elem.toMap()["begin"].toInt())+" "+QString::number(elem.toMap()["duration"].toInt())+ " "+QString::number(elem.toMap()["travel"].toInt())+":";
 		//tmp_holidays = elem.second.toList();
 		//painter->setBrush(Qt::LinearGradientPattern);
-		/*painter->setPen(Qt::darkRed);
-		painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
-		painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale, option.rect.y()+2, (elem.toMap()["duration"].toInt() - 1)*_scale, 24);*/
+		/* Пример того, как отображать конфликты: ----------------------------------------*
+		 * painter->setPen(Qt::darkRed);
+		 * painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
+		 * painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale, option.rect.y()+2, (elem.toMap()["duration"].toInt() - 1)*_scale, 24);
+		 * ------------------------------------------------------------------------------*/
 		painter->setPen(Qt::darkGreen);
 		painter->setBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
 		painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale, option.rect.y()+4, (elem.toMap()["duration"].toInt() - 1)*_scale, 20);
 		if (elem.toMap()["travel"].toInt() > 0){
-			/*painter->setPen(Qt::darkRed);
-			painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
-			painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale + (elem.toMap()["duration"].toInt() -1)*_scale, option.rect.y()+2, (elem.toMap()["travel"].toInt() - 1)*_scale, 24);*/
+			/* тоже отображается при конфликтах -----------------------------------------*
+			 * painter->setPen(Qt::darkRed);
+			 * painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
+			 * painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale + (elem.toMap()["duration"].toInt() -1)*_scale, option.rect.y()+2, (elem.toMap()["travel"].toInt() - 1)*_scale, 24);
+			 * -------------------------------------------------------------------------*/
 			painter->setPen(Qt::blue);
 			painter->setBrush(QBrush(Qt::blue, Qt::SolidPattern));
 			painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale+(elem.toMap()["duration"].toInt() -1)*_scale, option.rect.y()+4, (elem.toMap()["travel"].toInt() - 1)*_scale, 20);

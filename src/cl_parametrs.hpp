@@ -23,9 +23,9 @@ public:
 	void loadFromFile();
 	void saveSettings();
 	void setIdUnit(int _idUnit) {idUnit = _idUnit;}
-	int getIdUnit() {return idUnit;}
-	int getYear() {return workYear;}
-	std::string getNameConfFile() {return conf_file;}
+	int getIdUnit() const {return idUnit;}
+	int getYear() const {return workYear;}
+	std::string getNameConfFile() const {return conf_file;}
 	void setYear(int _workYear) {workYear = _workYear;}
 	bool isHelp();
 	bool isVersion();

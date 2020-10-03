@@ -24,6 +24,7 @@
 #include "cl_parametrs.hpp"
 #include "person_model.hpp"
 #include "modelMembersGroup.hpp"
+#include "tcondition.hpp"
 #include "dialog_conditions.hpp"
 #include "str_from_file.hpp"
 

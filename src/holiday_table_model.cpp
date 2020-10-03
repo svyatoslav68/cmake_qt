@@ -12,6 +12,8 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include "tcondition.hpp"
+#include "modelMembersGroup.hpp"
 #include "str_from_file.hpp"
 #include "cl_parametrs.hpp"
 #include "holiday_table_model.hpp"
@@ -23,7 +25,7 @@ using std::string;
 
 //const string HolidayTableModel::Template_SQL_Fill =  ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "ListPerson", "getListPersonsUnit");
 
-HolidayTableModel::HolidayTableModel(vector<std::string> persons):
+/*HolidayTableModel::HolidayTableModel(vector<std::string> persons):
 										HolidayTableModel(){
 	auto person_iterator = persons.cbegin();
 	int number = 0;
@@ -33,7 +35,7 @@ HolidayTableModel::HolidayTableModel(vector<std::string> persons):
 		content[++number] = p;
 		person_iterator++;
 	}
-}
+}*/
 
 HolidayTableModel::HolidayTableModel():								
 	Template_SQL_Fill(ValuesFromXML(appParametrs.getNameConfFile().c_str()).
@@ -65,6 +67,7 @@ HolidayTableModel::HolidayTableModel():
 			std::string SQL = ss.str();
 			/*Создадим здесь вектор*/
 			vector<THoliday> *vec = new vector<THoliday>();
+			std::set<boost::gregorian::date> *conflicts = new std::set<boost::gregorian::date>();
 			mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
 			if (mysql_status){
 				std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
@@ -73,12 +76,12 @@ HolidayTableModel::HolidayTableModel():
 				data_holidays = mysql_store_result(appParametrs.getDescriptorBD());
 				MYSQL_ROW row_holiday = mysql_fetch_row(data_holidays);
 				while(row_holiday){
-					vec->push_back(THoliday(boost::lexical_cast<int>(row_holiday[0]), boost::lexical_cast<int>(row[0]), row_holiday[2], boost::lexical_cast<int>(row_holiday[3]), boost::lexical_cast<int>(row_holiday[4]), row_holiday[1]));
+					vec->push_back(THoliday(boost::lexical_cast<int>(row_holiday[0]), /*boost::lexical_cast<int>(row[0]),*/ row_holiday[2], boost::lexical_cast<int>(row_holiday[3]), boost::lexical_cast<int>(row_holiday[4]), row_holiday[1]));
 					row_holiday = mysql_fetch_row(data_holidays);
 				}
 			}
-			pair<std::string, vector<THoliday>*> p(row[2], vec);
-			content[++number] = p;
+			std::tuple<int, std::string, vector<THoliday>*, std::set<boost::gregorian::date>*> t(boost::lexical_cast<int>(row[0]), row[2], vec, conflicts);
+			content[++number] = t;
 			row = mysql_fetch_row(data_from_BD);
 		}
 	}
@@ -86,7 +89,8 @@ HolidayTableModel::HolidayTableModel():
 
 HolidayTableModel::~HolidayTableModel(){
 	for (auto content_iterator: content){
-		delete content_iterator.second.second;
+		delete std::get<2>(content_iterator.second);
+		delete std::get<3>(content_iterator.second);
 	}
 }
 
@@ -112,11 +116,11 @@ QVariant HolidayTableModel::data(const QModelIndex &index, int role) const{
 	if (role == Qt::DisplayRole || role == Qt::EditRole){
 		switch (index.column()){
 			case Number: return index.row() + 1;
-			case FIO: return content.at(index.row() + 1).first.c_str();
+			case FIO: return std::get<1>(content.at(index.row() + 1)).c_str();
 			case Holidays:{
 			 /* Создаем QList из QMap, содержащих словарь параметров отпуска */
 			 QList<QVariant> list_person_holidays;
-			 for (auto holiday : *(content.at(index.row()+1)).second){
+			 for (auto holiday : *(std::get<2>(content.at(index.row()+1)))){
 				 QMap<QString, QVariant> map_days { {"begin", QVariant(holiday.firstDay())},
 											 	    {"duration", QVariant(holiday.numberDaysHoliday())},
 												    {"travel", QVariant(holiday.numberDaysTravel())}
@@ -127,6 +131,9 @@ QVariant HolidayTableModel::data(const QModelIndex &index, int role) const{
 			}
 			default: return -1;
 		}
+	}
+	if (role == Qt::DecorationRole) {
+		return QVariant();
 	}
 	return QVariant();
 }
@@ -172,8 +179,10 @@ bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value,
 	if (!index.isValid() || role != Qt::EditRole || 
 		index.column() != Holidays || index.row() < 0 || index.row() > content.size())
 		return false;
-	std::string FIO = content.at(index.row()+1).first;
-	vector<THoliday> *vec = content.at(index.row()+1).second;
+	int idPerson = std::get<0>(content.at(index.row()+1));
+	std::string FIO = std::get<1>(content.at(index.row()+1));
+	vector<THoliday> *vec = std::get<2>(content.at(index.row()+1));
+	std::set<boost::gregorian::date> *conflicts = std::get<3>(content.at(index.row()+1));
 	QVector<QVariant> vectorOfRectHolidays = value.toList().toVector();
 	int i = 0;
 	date firstDayYear = date(appParametrs.getYear(), Jan, 1);
@@ -185,9 +194,39 @@ bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value,
 		++i;
 		//std::cout << "begin = " << holiday.beginDate() << std::endl;
 	}
-	pair<std::string, vector<THoliday>*> p(FIO, vec);
-	content[index.row()+1] = p;
+	std::tuple<int, std::string, vector<THoliday>*, std::set<boost::gregorian::date>*> t(idPerson, FIO, vec, conflicts);
+	content[index.row()+1] = t;
 	emit dataChanged(index, index);
 	return true;
+}
+
+void HolidayTableModel::fillConflicts(std::vector<int> changedRows) {
+	std::vector<ItemOfGroup> groups;
+	ValuesFromXML vx = ValuesFromXML(appParametrs.getNameConfFile().c_str());
+	auto vectorNames = vx.getNamesGroup("FILE.Groups");
+	for (auto name_group: vectorNames){
+		/* Создаем группу*/
+		ItemOfGroup item_group(name_group);
+		//std::cout << "Create group " << item_group.name << std::endl;
+		/* Заполняем вектор списка членов группы */
+		for (auto member : vx.getMembersGroup("FILE.Groups", name_group)){
+			MemberGroup item_member(boost::lexical_cast<int>(member), &item_group);
+			item_group.children->push_back(item_member);
+		}
+		for (auto pair_condition : vx.getConditionsGroup("FILE.Groups", name_group)){
+			ConditionOfGroup item_condition(pair_condition, &item_group);
+			item_group.conditions->push_back(item_condition);
+		}
+		for (auto it : content){
+			if (std::find(item_group.children->begin(), item_group.children->end(), std::get<0>(it)))
+				std::cout << std::get<0>(it) << std::endl;
+			it++;
+		}
+		/* Присваиваем соотвествующему полю указатель на вектор списка членов */
+		groups.push_back(item_group);
+	}
+	for(auto row:changedRows){
+		
+	}
 }
 

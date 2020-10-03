@@ -17,11 +17,6 @@ set(HEADER_DIR $ENV{HOME}/mylib/include)
 set(LIB_DIR $ENV{HOME}/mylib/lib)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-configure_file(
-	${CMAKE_HOME_DIRECTORY}/version.hpp.in
-	${CMAKE_CURRENT_BINARY_DIR}/version.hpp
-)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -33,10 +28,15 @@ file(GLOB HOLIDAY_SRC
 
 list(APPEND CMAKE_MODULE_PATH $ENV{HOME}/cmake_modules)
 
+set(TARGET_APP qHoliday)
+
+add_executable(${TARGET_APP} ${HOLIDAY_SRC})
+
 # В добавление в список поиска каталога с заголовками mysql
+message("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}" )
 find_package(MariaDBClient REQUIRED)
 if(MariaDBClient_FOUND)
-	include_directories(${MariaDBClient_INCLUDE_DIR})
+	target_include_directories(${TARGET_APP} PUBLIC ${MariaDBClient_INCLUDE_DIR})
 	message("MariaDBClient_LIBRARIES = ${MariaDBClient_LIBRARIES}")
 	message("MariaDBClient_INCLUDE_DIR = ${MariaDBClient_INCLUDE_DIR}")
 else()
@@ -55,10 +55,6 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS program_options date_time)
 find_package(Qt5 REQUIRED COMPONENTS Widgets Core Gui) 
-
-set(TARGET_APP qHoliday)
-
-add_executable(${TARGET_APP} ${HOLIDAY_SRC})
 
 if(Boost_FOUND)
 	message("Boost_LIBRARIES = " ${Boost_LIBRARIES})

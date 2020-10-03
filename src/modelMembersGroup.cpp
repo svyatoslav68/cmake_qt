@@ -1,6 +1,6 @@
 /***********************************************************
 **             Модель состава группы(реализация)          **
-**               Файл ModelGroups.cpp               **
+**               Файл modelMembersGroup.cpp               **
 ***********************************************************/
 #include <iostream>
 #include <string>
@@ -48,22 +48,6 @@ MemberGroup::~MemberGroup(){
 	//delete parent;
 }
 
-ItemOfGroup::ItemOfGroup(std::string _name):name(_name){
-		children = new std::vector<MemberGroup>;
-		conditions = new std::vector<ConditionOfGroup>;
-}
-
-ItemOfGroup::ItemOfGroup(const ItemOfGroup &group){
-	name = group.name;
-	children = new std::vector<MemberGroup>(group.children->begin(), group.children->end());
-	conditions = new std::vector<ConditionOfGroup>(group.conditions->begin(), group.conditions->end());
-	//copy(group.children->begin(), group.children->end(), children->begin());
-}
-
-ItemOfGroup::~ItemOfGroup(){
-	delete conditions;
-	delete children;
-}
 
 Qt::ItemFlags ModelGroups::flags(const QModelIndex &index) const{
 	Qt::ItemFlags theFlags;// = QAbstractItemModel::flags(index);
