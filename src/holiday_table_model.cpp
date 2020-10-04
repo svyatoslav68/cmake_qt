@@ -5,6 +5,7 @@
 #include <utility>
 #include <map>
 #include <vector>
+#include <algorithm>
 #include <string>
 #include <QVariant>
 #include <QGraphicsScene>
@@ -217,10 +218,12 @@ void HolidayTableModel::fillConflicts(std::vector<int> changedRows) {
 			ConditionOfGroup item_condition(pair_condition, &item_group);
 			item_group.conditions->push_back(item_condition);
 		}
-		for (auto it : content){
-			if (std::find(item_group.children->begin(), item_group.children->end(), std::get<0>(it)))
-				std::cout << std::get<0>(it) << std::endl;
-			it++;
+		for (auto it : content){ // Проходим по всему содержимому таблицы отпусков
+			if (std::find(item_group.children->begin(), item_group.children->end(), std::get<0>(it.second)) != item_group.children->end()){					// Если идентификатор сотрудника есть среди идентификаторов в условии
+				std::cout << std::get<0>(it.second) << ":";//std::endl;
+				for (auto it_holiday : *(std::get<2>(it.second))) { // Пройти по всем отпускам сотрудника
+				}
+			}
 		}
 		/* Присваиваем соотвествующему полю указатель на вектор списка членов */
 		groups.push_back(item_group);

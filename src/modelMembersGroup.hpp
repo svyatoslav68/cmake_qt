@@ -28,6 +28,7 @@ struct MemberGroup {
 	MemberGroup(int _idBD, std::string _name, ItemOfGroup *_parent = nullptr):idBD(_idBD), name(_name), parent(_parent){}
 	MemberGroup(const MemberGroup &);
 	~MemberGroup();
+	bool operator==(const int &id);
 	int idBD; /* Поле содержит уникальный ключ записи в базе данных, 
 	соответствующий сотруднику-члену группы */
 	std::string name;

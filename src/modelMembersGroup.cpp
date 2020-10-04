@@ -48,6 +48,9 @@ MemberGroup::~MemberGroup(){
 	//delete parent;
 }
 
+bool MemberGroup::operator==(const int &id){
+	return this->idBD == id;
+}
 
 Qt::ItemFlags ModelGroups::flags(const QModelIndex &index) const{
 	Qt::ItemFlags theFlags;// = QAbstractItemModel::flags(index);
