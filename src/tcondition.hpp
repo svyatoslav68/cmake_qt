@@ -14,7 +14,8 @@ struct ItemOfGroup {
 	std::string name;
 	std::vector<MemberGroup>  *children;
 	std::vector<ConditionOfGroup> *conditions;
-	std::array<int,366> holidays_on_data;
+	//std::array<int,366> holidays_in_year {0};
+	std::array<std::pair<int, std::vector<int>>,366> holidays_in_year;
 };
 
 #endif //TCONDITION_HPP

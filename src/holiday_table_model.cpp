@@ -201,7 +201,8 @@ bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value,
 	return true;
 }
 
-void HolidayTableModel::fillConflicts(std::vector<int> changedRows) {
+void HolidayTableModel::fillConflicts(const std::vector<int> &changedRows) {
+	using bt=boost::gregorian::date;
 	std::vector<ItemOfGroup> groups;
 	ValuesFromXML vx = ValuesFromXML(appParametrs.getNameConfFile().c_str());
 	auto vectorNames = vx.getNamesGroup("FILE.Groups");
@@ -218,18 +219,51 @@ void HolidayTableModel::fillConflicts(std::vector<int> changedRows) {
 			ConditionOfGroup item_condition(pair_condition, &item_group);
 			item_group.conditions->push_back(item_condition);
 		}
+		
 		for (auto it : content){ // Проходим по всему содержимому таблицы отпусков
 			if (std::find(item_group.children->begin(), item_group.children->end(), std::get<0>(it.second)) != item_group.children->end()){					// Если идентификатор сотрудника есть среди идентификаторов в условии
-				std::cout << std::get<0>(it.second) << ":";//std::endl;
+				std::set<bt> holidays_person; // Множество дат составляющих все отпуска сотрудника
+				std::cout << std::get<0>(it.second) << ":" << std::get<1>(it.second) << std::endl;
 				for (auto it_holiday : *(std::get<2>(it.second))) { // Пройти по всем отпускам сотрудника
+					std::set<bt> dates = it_holiday.datesHoliday();
+					holidays_person.insert(dates.begin(), dates.end());
+				}
+				for (auto it_date : holidays_person){ // Проходим по всем датам, составляющим отпуска сотрудников
+					// Инкрементируем член массива, соответсвующий дню года, на который попадает отпуск сотрудника //
+					++(item_group.holidays_in_year[it_date.day_of_year()].first);
+					//++item_group.holidays_in_year[it_date.day_of_year()];
+					for (auto condition : *item_group.conditions){
+						//std::cout <<it_date.day_of_year() << ":" << item_group.holidays_in_year[it_date.day_of_year()];
+						if (item_group.holidays_in_year[it_date.day_of_year()].first > condition.number_members) {
+							std::get<3>(it.second)->insert(it_date);
+							std::cout << std::get<1>(it.second) << '-' << it_date << " : ";
+						}
+					}
+					//std::cout<<std::endl;
 				}
 			}
 		}
 		/* Присваиваем соотвествующему полю указатель на вектор списка членов */
 		groups.push_back(item_group);
-	}
-	for(auto row:changedRows){
-		
+		/*std::cout << "Группа условий: " << item_group.name << std::endl;
+		uint16_t number_day {0};
+		for (int n : item_group.holidays_in_year){
+			++number_day;
+			for (auto condition : *item_group.conditions){
+				if (n > condition.number_members) {
+					using bd = boost::gregorian::date_duration;
+					//std::cout << std::showpos << n << ':';
+					bt fail_date = bt(2020, boost::gregorian::Jan, 1) + bd(number_day-1);
+					//std::cout << fail_date << " : ";
+					for (auto member_of_group : *item_group.children){
+						if (){}
+					}
+				}
+				else
+					;//std::cout << std::noshowpos << n << ':';
+			}
+		}
+		std::cout << std::endl;*/
 	}
 }
 

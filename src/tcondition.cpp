@@ -15,6 +15,9 @@ extern clParametrs appParametrs;
 ItemOfGroup::ItemOfGroup(std::string _name):name(_name){
 		children = new std::vector<MemberGroup>;
 		conditions = new std::vector<ConditionOfGroup>;
+		for (auto pair_content : holidays_in_year) {
+			pair_content.first = 0;
+		}
 }
 
 ItemOfGroup::ItemOfGroup(const ItemOfGroup &group){
@@ -22,6 +25,9 @@ ItemOfGroup::ItemOfGroup(const ItemOfGroup &group){
 	children = new std::vector<MemberGroup>(group.children->begin(), group.children->end());
 	conditions = new std::vector<ConditionOfGroup>(group.conditions->begin(), group.conditions->end());
 	//copy(group.children->begin(), group.children->end(), children->begin());
+	/*for (auto pair_content : holidays_in_year) {
+		pair_content.first = 0;
+	}*/
 }
 
 ItemOfGroup::~ItemOfGroup(){

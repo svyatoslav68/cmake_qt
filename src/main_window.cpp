@@ -48,6 +48,8 @@ void MainWindow::createModelAndView(){
 	if (holidayModel)
 		delete holidayModel;
 	holidayModel = new HolidayTableModel();
+	std::vector<int> rows {};
+	holidayModel->fillConflicts(rows);
 	int year = appParametrs.getYear();
 	if (mainView)
 		delete mainView;
