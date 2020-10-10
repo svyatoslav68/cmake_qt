@@ -20,7 +20,7 @@
 #include "graphic_widget.hpp"
 #include "365x1.xpm"
 
-const char *HolidayDelegate::template_name_file_background = "./BackGround_%d.png";		
+//const char *HolidayDelegate::template_name_file_background = "./BackGround_%d.png";		
 
 
 void HolidayDelegate::paint(QPainter *painter, 
@@ -35,7 +35,6 @@ void HolidayDelegate::paint(QPainter *painter,
 	rect_height = option.rect.height();	
 	//std::cout << rect_width << " ";
 	//painter->drawText(option.rect, Qt::AlignCenter, QString::number(rect_height)+QString::number(rect_width));
-	QList<QVariant> list_from_model = model->data(index, Qt::EditRole).toList();
 	//QString tmp_holidays="";
 	if (_back_ground) {
 		/*std::stringstream ss;
@@ -55,6 +54,15 @@ void HolidayDelegate::paint(QPainter *painter,
 		painter->drawPixmap(option.rect, pixmap->scaled(option.rect.width(), option.rect.height()), source);
 		delete pixmap;
 	}
+	QList<QVariant> list_period_fails = model->data(index, Qt::DecorationRole).toList();
+	for (auto &elem :list_period_fails){
+		 /*std::cout << "begin_day = " << elem.toMap()["begin_day"].toInt() << std::endl;
+		 std::cout << "number_days = " << elem.toMap()["number_days"].toInt() << std::endl;*/
+		 painter->setPen(Qt::darkRed);
+		 painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
+		 painter->drawRect(option.rect.x()+(elem.toMap()["begin_day"].toInt() - 1)*_scale, option.rect.y()+2, (elem.toMap()["number_days"].toInt())*_scale, 24);
+	}
+	QList<QVariant> list_from_model = model->data(index, Qt::EditRole).toList();
 	for (auto &elem : list_from_model){
 		using namespace boost::gregorian;
 		//tmp_holidays+=QString::number(elem.toMap()["begin"].toInt())+" "+QString::number(elem.toMap()["duration"].toInt())+ " "+QString::number(elem.toMap()["travel"].toInt())+":";
@@ -67,7 +75,7 @@ void HolidayDelegate::paint(QPainter *painter,
 		 * ------------------------------------------------------------------------------*/
 		painter->setPen(Qt::darkGreen);
 		painter->setBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
-		painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale, option.rect.y()+4, (elem.toMap()["duration"].toInt() - 1)*_scale, 20);
+		painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale, option.rect.y()+4, (elem.toMap()["duration"].toInt())*_scale, 20);
 		if (elem.toMap()["travel"].toInt() > 0){
 			/* тоже отображается при конфликтах -----------------------------------------*
 			 * painter->setPen(Qt::darkRed);
@@ -76,7 +84,7 @@ void HolidayDelegate::paint(QPainter *painter,
 			 * -------------------------------------------------------------------------*/
 			painter->setPen(Qt::blue);
 			painter->setBrush(QBrush(Qt::blue, Qt::SolidPattern));
-			painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale+(elem.toMap()["duration"].toInt() -1)*_scale, option.rect.y()+4, (elem.toMap()["travel"].toInt() - 1)*_scale, 20);
+			painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale+(elem.toMap()["duration"].toInt())*_scale, option.rect.y()+4, (elem.toMap()["travel"].toInt())*_scale, 20);
 		}
 	}
 	//painter->drawText(option.rect, Qt::AlignCenter, tmp_holidays);

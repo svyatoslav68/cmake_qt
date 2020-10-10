@@ -35,7 +35,7 @@ public:
 	QModelIndex index ( int row, int column, const QModelIndex &) const;
 	QModelIndex parent ( const QModelIndex & ) const;
 	/*********************************************************************/
-	void fillConflicts(const std::vector<int> &changedRows);
+	void fillConflicts(); //const std::vector<int> &changedRows);
 private:
 	const std::string Template_SQL_Fill;
 	const std::string Template_SQL_Holidays;
