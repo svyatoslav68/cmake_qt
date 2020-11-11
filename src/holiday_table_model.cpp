@@ -5,6 +5,7 @@
 #include <utility>
 #include <map>
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <string>
 #include <QVariant>
@@ -12,6 +13,7 @@
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
+#include <iomanip>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include "tcondition.hpp"
 #include "modelMembersGroup.hpp"
@@ -39,62 +41,18 @@ using std::string;
 	}
 }*/
 
-HolidayTableModel::HolidayTableModel():								
-	Template_SQL_Fill(ValuesFromXML(appParametrs.getNameConfFile().c_str()).
-	getStrSQL("FILE.SQL", "ListPerson", "getMilitaryPersonsUnit")),
-	Template_SQL_Holidays(ValuesFromXML(appParametrs.getNameConfFile().
-	c_str()).getStrSQL("FILE.SQL", "THoliday", "getPersonHolidays"))
+HolidayTableModel::HolidayTableModel()
 {
-	MYSQL_RES *data_from_BD = nullptr;
-	//boost::format fmter(Template_SQL_Fill);
-	std::stringstream ss;
-	//ss << fmter%appParametrs.getIdUnit();
-	ss << boost::format(Template_SQL_Fill)%appParametrs.getIdUnit() << std::flush;
-	std::string SQL = ss.str();
-	int mysql_status = 0;
-	mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
-	if (mysql_status){
-		std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
-	}
-	else {
-		data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
-		MYSQL_ROW row;
-		row = mysql_fetch_row(data_from_BD);
-		int number = 0;
-		while (row){
-			MYSQL_RES *data_holidays;
-			ss.str("");
-			ss.clear();
-			ss << boost::format(Template_SQL_Holidays)%appParametrs.getYear()%row[0] << std::flush;
-			std::string SQL = ss.str();
-			//std::cout << "Отпускник: " << row[2] << std::endl;
-			/*Создадим здесь вектор*/
-			vector<THoliday> *vec = new vector<THoliday>();
-			std::set<boost::gregorian::date> *conflicts = new std::set<boost::gregorian::date>();
-			mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
-			if (mysql_status){
-				std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
-			}
-			else{
-				data_holidays = mysql_store_result(appParametrs.getDescriptorBD());
-				MYSQL_ROW row_holiday = mysql_fetch_row(data_holidays);
-				while(row_holiday){
-					//std::cout << "Вызывается конструктор THoliday(), begin=" << row_holiday[2] << ", duration=" << row_holiday[3] << ", travel=" << row_holiday[4] << std::endl; 
-					vec->push_back(THoliday(boost::lexical_cast<int>(row_holiday[0]), /*boost::lexical_cast<int>(row[0]),*/ row_holiday[2], boost::lexical_cast<int>(row_holiday[3]), boost::lexical_cast<int>(row_holiday[4]), row_holiday[1]));
-					row_holiday = mysql_fetch_row(data_holidays);
-				}
-			}
-			std::tuple<int, std::string, vector<THoliday>*, std::set<boost::gregorian::date>*> t(boost::lexical_cast<int>(row[0]), row[2], vec, conflicts);
-			content[number++] = t;
-			row = mysql_fetch_row(data_from_BD);
-		}
-	}
 }
 
 HolidayTableModel::~HolidayTableModel(){
 	for (auto content_iterator: content){
-		delete std::get<2>(content_iterator.second);
-		delete std::get<3>(content_iterator.second);
+		std::vector<THoliday> *vectorHolidays = std::get<2>(content_iterator.second);
+		if (vectorHolidays)
+			delete vectorHolidays;
+		std::set<boost::gregorian::date> *setConflicts = std::get<3>(content_iterator.second);
+		if (setConflicts)
+			delete setConflicts;
 	}
 }
 
@@ -195,6 +153,7 @@ bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value,
 		index.column() != Holidays || index.row() < 0 || index.row() > content.size())
 		return false;
 	int idPerson = std::get<0>(content.at(index.row()));
+	varCodPerson.insert(index.row());
 	std::string FIO = std::get<1>(content.at(index.row()));
 	vector<THoliday> *vec = std::get<2>(content.at(index.row()));
 	std::set<boost::gregorian::date> *conflicts = std::get<3>(content.at(index.row()));
@@ -216,10 +175,72 @@ bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value,
 	return true;
 }
 
+void HolidayTableModel::loadFromBD(){
+	for (auto content_iterator: content){
+		std::vector<THoliday> *vectorHolidays = std::get<2>(content_iterator.second);
+		if (vectorHolidays)
+			delete vectorHolidays;
+		std::set<boost::gregorian::date> *setConflicts = std::get<3>(content_iterator.second);
+		if (setConflicts)
+			delete setConflicts;
+	}
+	content.clear();
+	const std::string Template_SQL_Fill = ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "ListPerson", "getMilitaryPersonsUnit");
+	const std::string Template_SQL_Holidays = 
+	ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "THoliday", "getPersonHolidays");
+	MYSQL_RES *data_from_BD = nullptr;
+	//boost::format fmter(Template_SQL_Fill);
+	std::stringstream ss;
+	//ss << fmter%appParametrs.getIdUnit();
+	ss << boost::format(Template_SQL_Fill)%appParametrs.getIdUnit() << std::flush;
+	std::string SQL = ss.str();
+	int mysql_status = 0;
+	mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
+	if (mysql_status){
+		std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
+	}
+	else {
+		data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
+		MYSQL_ROW row;
+		row = mysql_fetch_row(data_from_BD);
+		int number = 0;
+		while (row){
+			MYSQL_RES *data_holidays;
+			ss.str("");
+			ss.clear();
+			ss << boost::format(Template_SQL_Holidays)%appParametrs.getYear()%row[0] << std::flush;
+			std::string SQL = ss.str();
+			//std::cout << "Отпускник: " << row[2] << std::endl;
+			/*Создадим здесь вектор*/
+			vector<THoliday> *vec = new vector<THoliday>();
+			std::set<boost::gregorian::date> *conflicts = new std::set<boost::gregorian::date>();
+			mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
+			if (mysql_status){
+				std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
+			}
+			else{
+				data_holidays = mysql_store_result(appParametrs.getDescriptorBD());
+				MYSQL_ROW row_holiday = mysql_fetch_row(data_holidays);
+				while(row_holiday){
+					//std::cout << "Вызывается конструктор THoliday(), begin=" << row_holiday[2] << ", duration=" << row_holiday[3] << ", travel=" << row_holiday[4] << std::endl; 
+					vec->push_back(THoliday(boost::lexical_cast<int>(row_holiday[0]), /*boost::lexical_cast<int>(row[0]),*/ row_holiday[2], boost::lexical_cast<int>(row_holiday[3]), boost::lexical_cast<int>(row_holiday[4]), row_holiday[1]));
+					row_holiday = mysql_fetch_row(data_holidays);
+				}
+			}
+			std::tuple<int, std::string, vector<THoliday>*, std::set<boost::gregorian::date>*> t(boost::lexical_cast<int>(row[0]), row[2], vec, conflicts);
+			content[number++] = t;
+			row = mysql_fetch_row(data_from_BD);
+		}
+		delete data_from_BD;
+	}
+}
+
 void HolidayTableModel::fillConflicts(){ //const std::vector<int> &changedRows) {
 	using bt=boost::gregorian::date;
 	for (auto it : content){ // Проходим по всему содержимому таблицы отпусков
-		std::get<3>(it.second)->clear();
+		std::set<boost::gregorian::date> *setConflicts = std::get<3>(it.second);
+		if (setConflicts)
+			setConflicts->clear();
 	}
 	std::vector<ItemOfGroup> groups;
 	ValuesFromXML vx = ValuesFromXML(appParametrs.getNameConfFile().c_str());
@@ -239,6 +260,7 @@ void HolidayTableModel::fillConflicts(){ //const std::vector<int> &changedRows) 
 		}
 		for (auto it : content){ // Проходим по всему содержимому таблицы отпусков
 			if (std::find(item_group.children->begin(), item_group.children->end(), std::get<0>(it.second)) != item_group.children->end()){					// Если идентификатор сотрудника есть среди идентификаторов в условии
+				//std::set<boost::gregorian::date> *setOfConditions = new std::set<boost::gregorian::date>();
 				std::set<bt> holidays_person; // Множество дат составляющих все отпуска сотрудника
 				//std::cout << std::get<0>(it.second) << ":" << std::get<1>(it.second) << std::endl;
 				for (auto it_holiday : *(std::get<2>(it.second))) { // Пройти по всем отпускам сотрудника
@@ -284,6 +306,74 @@ void HolidayTableModel::fillConflicts(){ //const std::vector<int> &changedRows) 
 			}
 		}
 		std::cout << std::endl;*/
+	}
+}
+
+void HolidayTableModel::saveToTxt(std::string nameTxtFile){
+	/*using std::cout;
+	using std::setw;
+	using std::setfill;
+	using std::left;
+	using std::right;
+	using std::ios_base;*/
+	using namespace std;
+	for (auto the_person:content){
+		cout << std::get<0>(the_person.second) << ":" << std::get<1>(the_person.second) << std::endl;
+			/*cout << right <>< setw(25) << "Начало";
+			cout << right << setw(10) << "Длина" << std::endl;
+			cout.setf(ios_base::left, ios_base::adjustfield);*/
+		for (auto the_holiday:*(std::get<2>(the_person.second))){
+			//std::cout << std::setiosflags(std::ios::right);
+			cout << right;
+			cout.width(25);
+			cout  << the_holiday.beginDate();
+			cout.width(10);
+			cout <<  the_holiday.numberDaysHoliday();
+			cout.width(6);
+			cout << right << the_holiday.numberDaysTravel() << std::endl;
+		}
+	}
+}
+
+void HolidayTableModel::saveToBD(){
+	const std::string Template_SQL_Update = ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "THoliday", "updateHoliday");
+	MYSQL_RES *data_from_BD = nullptr; // Pointer to return data from query
+	for (auto it: varCodPerson){
+		for (auto holiday:*(std::get<2>(content[it]))){
+			std::stringstream ss;
+			ss << boost::format(Template_SQL_Update)%boost::gregorian::to_iso_extended_string(holiday.beginDate())%holiday.numberDaysHoliday()%holiday.numberDaysTravel()%holiday.getCodHoliday() << std::flush;
+			std::string SQL = ss.str();
+			int mysql_status = 0;
+			mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
+			if (mysql_status){
+				std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
+			}
+			else {
+				std::cout << "Выполнен запрос: " << SQL << std::endl;
+				data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
+			}
+		}
+		std::cout << std::endl;
+	}
+	varCodPerson.clear();
+}
+
+void HolidayTableModel::outChangedData(){
+	std::cout << "Измененные сотрудники:\n";
+	for (auto it: varCodPerson){
+		std::cout << it << std::endl;
+		std::cout << std::get<1>(content[it]) << std::endl;
+		for (auto holiday:*(std::get<2>(content[it]))){
+			std::cout << std::right;
+			std::cout.width(20);
+			std::cout << holiday.beginDate();
+			std::cout.width(10);
+			std::cout <<holiday.numberDaysHoliday();
+			std::cout.width(10);
+			std::cout <<holiday.numberDaysTravel();
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
 	}
 }
 

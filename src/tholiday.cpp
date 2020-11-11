@@ -63,6 +63,10 @@ bt THoliday::beginDate() const{
 	return date_begin;
 }
 
+int THoliday::getCodHoliday() const{
+	return cod_holiday;
+}
+
 int THoliday::firstDay() const{
 	return date_begin.day_of_year();
 }
@@ -90,12 +94,23 @@ std::set<bt> THoliday::datesHoliday() const{
 
 std::set<int> THoliday::numbersDayHoliday() const{
 	using namespace boost::gregorian;
-
+	std::set<int> result;
+	date_period holiday_period(date_begin, holiday_duration + travel_duration);
+	day_iterator di(holiday_period.begin());
+	while (di != holiday_period.end()){
+		result.insert(di->day_of_year());
+		++di;
+	}
+	return result;
 }
 
 
 THoliday &THoliday::moveTo(int dayInYear)
 {
-
+	using namespace boost::gregorian;
+	greg_year year_holiday = date_begin.year();
+	date first_day_year(year_holiday, 1, 1);
+	date_begin = date_begin + date_duration(dayInYear);
+	return *this;
 }
 

@@ -33,7 +33,7 @@ extern clParametrs appParametrs;
 DialogConditions::DialogConditions(QWidget *parent):QDialog(parent){
 	ValuesFromXML vx = ValuesFromXML(appParametrs.getNameConfFile().c_str());
 	setWindowTitle("Условия для создания графика отпусков");
-	personModel = new PersonModel(this);
+	personModel = new PersonModel(PersonModel::SQL, this);
 	groupsModel = new ModelGroups(this);
 	groupsModel->loadFromXML();
 	membersModel = nullptr;

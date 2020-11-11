@@ -21,6 +21,7 @@ class HolidayTableModel: public QAbstractItemModel {
 	Q_OBJECT
 public:
 	enum Column {Number, FIO, Holidays};
+	enum MODE {SQL, TXT};
 	/*HolidayTableModel(std::vector<std::string> persons);*/
 	HolidayTableModel();
 	~HolidayTableModel();
@@ -35,12 +36,14 @@ public:
 	QModelIndex index ( int row, int column, const QModelIndex &) const;
 	QModelIndex parent ( const QModelIndex & ) const;
 	/*********************************************************************/
+	void loadFromBD();
 	void fillConflicts(); //const std::vector<int> &changedRows);
+	void saveToTxt(std::string nameTxtFile);
+	void saveToBD();
 private:
-	const std::string Template_SQL_Fill;
-	const std::string Template_SQL_Holidays;
 	//HolidayTableModel(){};
 	static const int COLUMN_COUNT = 3;
+	std::set<int> varCodPerson;
 	std::map<int, // Number row in table
 			std::tuple<int, // cod_person
 			std::string, // FIO
@@ -48,6 +51,7 @@ private:
 			std::set<boost::gregorian::date>* // Dates of conflicts
 				>> content;
 	std::vector<std::pair<std::vector<int>, int>> conditions;
+	void outChangedData();
 };
 
   

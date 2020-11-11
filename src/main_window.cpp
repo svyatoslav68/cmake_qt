@@ -24,6 +24,7 @@
 #include "holiday_view.hpp"
 #include "dialog_conditions.hpp"
 #include "dialog_units.hpp"
+#include "dialog_edit_file.hpp"
 
 extern clParametrs appParametrs;
 
@@ -49,6 +50,7 @@ void MainWindow::createModelAndView(){
 		delete holidayModel;
 	holidayModel = new HolidayTableModel();
 	//std::vector<int> rows {};
+	holidayModel->loadFromBD();
 	holidayModel->fillConflicts();
 	//connect(holidayModel, SIGNAL(dataChanged(QModelIndex(), QModelIndex())), );
 	int year = appParametrs.getYear();
@@ -78,6 +80,19 @@ void MainWindow::createActions()
 	actExit->setObjectName("actExit");
 	actExit->setShortcut(QKeySequence::Quit);
 	connect(actExit, SIGNAL(triggered()), this, SLOT(clickedOk()));
+	actCreateTxt = new QAction("Создать файл...", this);
+	actCreateTxt->setObjectName("actCreateTxt");
+	connect(actCreateTxt,  &QAction::triggered, this, [this](){this->showDialogEditFile();});
+	actLoadFromBD = new QAction("Загрузить из БД", this);
+	actLoadFromBD->setObjectName("actLoadFromBD");
+	connect(actLoadFromBD, &QAction::triggered, this, [this](){this->slotLoadFromBD();});
+	actLoadFromTxt = new QAction("Загрузить из файла...", this);
+	actLoadFromTxt->setObjectName("actLoadFromTxt");
+	connect(actLoadFromTxt, &QAction::triggered, this, [this](){this->showDialogSelectFile();});
+	actSaveToBD = new QAction("Сохранить в БД", this);
+	connect(actSaveToBD, &QAction::triggered, this, [this](){this->slotSaveBD();});
+	actSaveToTxt = new QAction("Сохранить в файл...", this);
+	connect(actSaveToTxt, &QAction::triggered, this, [this](){this->showDialogSaveFile();});
 	grpView = new QActionGroup(this);
 	actPlan = new QAction("Заявки на отпуск");
 	actPlan->setCheckable(true);
@@ -125,6 +140,12 @@ void MainWindow::createActions()
 void MainWindow::createMenu()
 {
 	menuFile = menuBar()->addMenu("&File");
+	menuFile->addAction(actCreateTxt);
+	menuFile->addAction(actLoadFromBD);
+	menuFile->addAction(actLoadFromTxt);
+	menuFile->addAction(actSaveToBD);
+	menuFile->addAction(actSaveToTxt);
+	menuFile->addSeparator();
 	menuFile->addAction(actExit);
 	menuView = menuBar()->addMenu("Вид");
 	menuView->addAction(actPlan);
@@ -205,5 +226,32 @@ void MainWindow::changeScale(int new_scale)
 {
 	scale = new_scale;
 	createModelAndView();
+}
+
+void MainWindow::slotLoadFromBD()
+{
+	holidayModel->loadFromBD();
+	holidayModel->fillConflicts();
+}
+
+void MainWindow::showDialogSelectFile()
+{
+
+}
+
+void MainWindow::showDialogEditFile()
+{
+	DialogEditTxtFile dialogFile;
+	if (dialogFile.exec() == QDialog::Accepted){
+		dialogFile.saveToFile();
+	}
+}
+
+void MainWindow::slotSaveBD(){
+	holidayModel->saveToBD();	
+}
+
+void MainWindow::showDialogSaveFile(){
+	holidayModel->saveToTxt(std::string("persons.txt"));
 }
 

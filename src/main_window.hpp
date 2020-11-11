@@ -27,7 +27,7 @@ private:
 	void createActions();
 	void createMenu();
 	void createModelAndView();
-	QAction *actExit;
+	QAction *actExit, *actCreateTxt, *actLoadFromBD, *actLoadFromTxt, *actSaveToBD, *actSaveToTxt;
 	QActionGroup *grpView;
 	QAction *actPlan, *actResult, *actRefresh;
 	QAction *actConditions, *actUnit, *actSetColors;
@@ -44,6 +44,11 @@ private:
 	int scale;
 private slots:
 	void changeScale(int new_scale);
+	void slotLoadFromBD();
+	void slotSaveBD();
+	void showDialogSelectFile();
+	void showDialogSaveFile();
+	void showDialogEditFile();
 	void dialogConditions();
 	void selectUnitSlot();
 	void refreshSlot();

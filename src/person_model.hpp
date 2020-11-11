@@ -8,7 +8,9 @@ class TPerson;
 class PersonModel : public QAbstractItemModel{
 public:
 	enum Column {ID, Position, FIO};
+	enum MODE {SQL, TXT};
 	PersonModel(QObject *parent = nullptr);
+	PersonModel(MODE mode, QObject *parent = nullptr);
 	virtual ~PersonModel();
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

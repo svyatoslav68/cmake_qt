@@ -17,23 +17,35 @@
 
 PersonModel::PersonModel(QObject *parent):QAbstractItemModel(parent),Template_SQL_Fill(ValuesFromXML(appParametrs.getNameConfFile().c_str()).
 	getStrSQL("FILE.SQL", "ListPerson", "getMilitaryPersonsUnit")){
-	MYSQL_RES *data_from_BD = nullptr;
-	std::stringstream ss;
-	ss << boost::format(Template_SQL_Fill)%appParametrs.getIdUnit() << std::flush;
-	std::string SQL = ss.str();
-	int mysql_status = 0;
-	mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
-	if (mysql_status){
-		std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
+}
+
+PersonModel::PersonModel(MODE mode, QObject *parent):PersonModel(parent) {
+	if (mode == SQL) {
+		MYSQL_RES *data_from_BD = nullptr;
+		std::stringstream ss;
+		ss << boost::format(Template_SQL_Fill)%appParametrs.getIdUnit() << std::flush;
+		std::string SQL = ss.str();
+		int mysql_status = 0;
+		mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
+		if (mysql_status){
+			std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
+		}
+		else {
+			data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
+			MYSQL_ROW row;
+			row = mysql_fetch_row(data_from_BD);
+			while (row){
+				content.push_back(std::make_tuple(boost::lexical_cast<int>(row[0]), row[1], row[2]));
+				row = mysql_fetch_row(data_from_BD);
+			}
+			delete data_from_BD;
+		}
+	}
+	else if (mode == TXT) {
+		ValuesFromXML PersonsFile("holidays.xml");			
 	}
 	else {
-		data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
-		MYSQL_ROW row;
-		row = mysql_fetch_row(data_from_BD);
-		while (row){
-			content.push_back(std::make_tuple(boost::lexical_cast<int>(row[0]), row[1], row[2]));
-			row = mysql_fetch_row(data_from_BD);
-		}
+		std::cerr << "Constructor PersonModel executed with incorrect parametrs\n";
 	}
 }
 

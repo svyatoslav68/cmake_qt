@@ -17,6 +17,7 @@ using bd=boost::gregorian::date_duration;
 class THoliday {
 public:
 	THoliday(){};
+	THoliday(const bt date_begin, const bd  holiday_duration, const bd travel_duration):cod_holiday(-1), date_begin(date_begin), holiday_duration(holiday_duration), travel_duration(travel_duration), name_holiday("manual"){};
 	THoliday(int _cod_holiday);
 	THoliday(	int _cod_holiday, 
 				/*int _cod_person, */
@@ -31,6 +32,7 @@ public:
 	THoliday& moveTo(int dayInYear);
 	bt beginDate() const;
 	int firstDay ()const;
+	int getCodHoliday() const;
 	void setBeginDate(bt newDate){date_begin = newDate;}
 	void setHolidayDuration(bd newHolidayDuration){holiday_duration = newHolidayDuration;}
 	int numberDaysHoliday() const;
