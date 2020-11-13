@@ -25,6 +25,8 @@ void GraphicsWidget::paintEvent(QPaintEvent *event)
 	painter.setPen(QPen(Qt::blue, Qt::SolidLine));
 	painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
 	painter.drawRect(_rectsHoliday[_currentHoliday]); 
+	painter.setBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
+	painter.drawRect(_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()]); 
 }
 
 void GraphicsWidget::keyPressEvent(QKeyEvent *event)
@@ -34,6 +36,7 @@ void GraphicsWidget::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Left:
 			if (event->modifiers() & Qt::ShiftModifier){
 				_rectsHoliday[_currentHoliday].setWidth(_rectsHoliday[_currentHoliday].width()-_scale);
+				_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].setWidth(_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].width()+_scale);
 			}
 			else
 				_rectsHoliday[_currentHoliday].moveLeft(_rectsHoliday[_currentHoliday].left()-_scale);
@@ -41,6 +44,7 @@ void GraphicsWidget::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Right:
 			if (event->modifiers() & Qt::ShiftModifier){
 				_rectsHoliday[_currentHoliday].setWidth(_rectsHoliday[_currentHoliday].width()+_scale);
+				_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].setWidth(_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].width()-_scale);
 			}
 			else
 				_rectsHoliday[_currentHoliday].moveRight(_rectsHoliday[_currentHoliday].right()+_scale);
