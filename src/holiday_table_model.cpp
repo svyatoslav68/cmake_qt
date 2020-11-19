@@ -83,11 +83,7 @@ QVariant HolidayTableModel::data(const QModelIndex &index, int role) const{
 			 /* Создаем QList из QMap, содержащих словарь параметров отпуска */
 			 QList<QVariant> list_person_holidays;
 			 for (auto holiday : *(std::get<2>(content.at(index.row())))){
-				 QMap<QString, QVariant> map_days { {"begin", QVariant(holiday.firstDay())},
-											 	    {"duration", QVariant(holiday.numberDaysHoliday())},
-												    {"travel", QVariant(holiday.numberDaysTravel())}
-				 };
-				 list_person_holidays.append(QVariant(map_days));
+				 list_person_holidays.append(QVariant(holiday.toMap()));
 			 }
 			 return list_person_holidays;
 			}
@@ -156,19 +152,22 @@ bool HolidayTableModel::setData(const QModelIndex &index, const QVariant &value,
 	varCodPerson.insert(index.row());
 	std::string FIO = std::get<1>(content.at(index.row()));
 	vector<THoliday> *vec = std::get<2>(content.at(index.row()));
-	std::set<boost::gregorian::date> *conflicts = std::get<3>(content.at(index.row()));
-	QVector<QVariant> vectorOfRectHolidays = value.toList().toVector();
+	std::set<date> *conflicts = std::get<3>(content.at(index.row()));
+	//QVector<QVariant> vectorOfRectHolidays = value.toList().toVector();
+	QVector<QVariant> vecMaps = value.toList().toVector();
 	int i = 0;
-	date firstDayYear = date(appParametrs.getYear(), Jan, 1);
+	//date firstDayYear = date(appParametrs.getYear(), Jan, 1);
 	for (auto &holiday : *vec) {
-		date_duration dd(vectorOfRectHolidays[i].toRect().left());
-		holiday.setBeginDate(firstDayYear + dd);
-		date_duration hd(vectorOfRectHolidays[i].toRect().right() - vectorOfRectHolidays[i].toRect().left());
-		holiday.setHolidayDuration(hd);
+		//date_duration dd(vectorOfRectHolidays[i].toRect().left());
+		gregorian_calendar::ymd_type ymd = gregorian_calendar::from_day_number(vecMaps[i].toMap()["begin"].toInt());
+		date load_date = { ymd.year, ymd.month, ymd.day };
+		holiday.setBeginDate(load_date);
+		//date_duration hd(vectorOfRectHolidays[i].toRect().right() - vectorOfRectHolidays[i].toRect().left());
+		holiday.setHolidayDuration(date_duration(vecMaps[i].toMap()["duration"].toInt()));
 		++i;
 		//std::cout << "begin = " << holiday.beginDate() << std::endl;
 	}
-	std::tuple<int, std::string, vector<THoliday>*, std::set<boost::gregorian::date>*> t(idPerson, FIO, vec, conflicts);
+	std::tuple<int, std::string, vector<THoliday>*, std::set<date>*> t(idPerson, FIO, vec, conflicts);
 	content[index.row()] = t;
 	fillConflicts();
 	emit dataChanged(index, index);
@@ -323,7 +322,6 @@ void HolidayTableModel::saveToTxt(std::string nameTxtFile){
 			cout << right << setw(10) << "Длина" << std::endl;
 			cout.setf(ios_base::left, ios_base::adjustfield);*/
 		for (auto the_holiday:*(std::get<2>(the_person.second))){
-			//std::cout << std::setiosflags(std::ios::right);
 			cout << right;
 			cout.width(25);
 			cout  << the_holiday.beginDate();

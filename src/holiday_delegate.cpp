@@ -56,35 +56,24 @@ void HolidayDelegate::paint(QPainter *painter,
 	}
 	QList<QVariant> list_period_fails = model->data(index, Qt::DecorationRole).toList();
 	for (auto &elem :list_period_fails){
-		 /*std::cout << "begin_day = " << elem.toMap()["begin_day"].toInt() << std::endl;
-		 std::cout << "number_days = " << elem.toMap()["number_days"].toInt() << std::endl;*/
 		 painter->setPen(Qt::darkRed);
 		 painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
-		 painter->drawRect(option.rect.x()+(elem.toMap()["begin_day"].toInt() - 1)*_scale, option.rect.y()+2, (elem.toMap()["number_days"].toInt())*_scale, 24);
+		 QMap<QString, QVariant> mapHoliday = elem.toMap();
+		 painter->drawRect(option.rect.x()+(mapHoliday["begin_day"].toInt() - 1)*_scale, option.rect.y()+2, (mapHoliday["number_days"].toInt())*_scale, 24);
 	}
 	QList<QVariant> list_from_model = model->data(index, Qt::EditRole).toList();
 	for (auto &elem : list_from_model){
 		using namespace boost::gregorian;
-		//tmp_holidays+=QString::number(elem.toMap()["begin"].toInt())+" "+QString::number(elem.toMap()["duration"].toInt())+ " "+QString::number(elem.toMap()["travel"].toInt())+":";
-		//tmp_holidays = elem.second.toList();
-		//painter->setBrush(Qt::LinearGradientPattern);
-		/* Пример того, как отображать конфликты: ----------------------------------------*
-		 * painter->setPen(Qt::darkRed);
-		 * painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
-		 * painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale, option.rect.y()+2, (elem.toMap()["duration"].toInt() - 1)*_scale, 24);
-		 * ------------------------------------------------------------------------------*/
 		painter->setPen(Qt::darkGreen);
 		painter->setBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
-		painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale, option.rect.y()+4, (elem.toMap()["duration"].toInt())*_scale, 20);
+		gregorian_calendar::ymd_type ymd = gregorian_calendar::from_day_number(elem.toMap()["begin"].toInt());
+		date new_date = { ymd.year, ymd.month, ymd.day };
+		int leftRect = new_date.day_of_year();
+		painter->drawRect(option.rect.x()+(leftRect - 1)*_scale, option.rect.y()+4, (elem.toMap()["duration"].toInt())*_scale, 20);
 		if (elem.toMap()["travel"].toInt() > 0){
-			/* тоже отображается при конфликтах -----------------------------------------*
-			 * painter->setPen(Qt::darkRed);
-			 * painter->setBrush(QBrush(Qt::darkRed, Qt::SolidPattern));
-			 * painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale + (elem.toMap()["duration"].toInt() -1)*_scale, option.rect.y()+2, (elem.toMap()["travel"].toInt() - 1)*_scale, 24);
-			 * -------------------------------------------------------------------------*/
 			painter->setPen(Qt::blue);
 			painter->setBrush(QBrush(Qt::blue, Qt::SolidPattern));
-			painter->drawRect(option.rect.x()+(elem.toMap()["begin"].toInt() - 1)*_scale+(elem.toMap()["duration"].toInt())*_scale, option.rect.y()+4, (elem.toMap()["travel"].toInt())*_scale, 20);
+			painter->drawRect(option.rect.x()+(leftRect - 1)*_scale+(elem.toMap()["duration"].toInt())*_scale, option.rect.y()+4, (elem.toMap()["travel"].toInt())*_scale, 20);
 		}
 	}
 	//painter->drawText(option.rect, Qt::AlignCenter, tmp_holidays);
@@ -105,13 +94,16 @@ void HolidayDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionVi
 void HolidayDelegate::setEditorData(QWidget *editor,
                                     const QModelIndex &index) const
 {
+	using bd=boost::gregorian::date;
+	using bdd=boost::gregorian::date_duration;
+	//std::cout << "------------From setEditorData(): -------------" << std::endl;
 	if (index.column() == HolidayTableModel::Holidays){
-		std::vector<QRect> holidays;
+		std::vector<THoliday> holidays;
 		QList<QVariant> list_from_model = index.model()->data(index, Qt::EditRole).toList();
-		for (auto &elem : list_from_model){
-			std::cout << "To Editor begin=" << elem.toMap()["begin"].toInt() - 1 << "; duration=" << elem.toMap()["duration"].toInt() << std::endl;
-			QRect rect((elem.toMap()["begin"].toInt()-1)*_scale, 4, (elem.toMap()["duration"].toInt())*_scale/*+elem.toMap()["travel"].toInt()*_scale - 1*/, 20);
-			holidays.push_back(rect);
+		for (auto elem : list_from_model){
+			THoliday hol(elem);
+			//hol.displayHoliday();
+			holidays.push_back(hol);
 		}
 		GraphicsWidget *graphicEditor = static_cast<GraphicsWidget *>(editor);
 		graphicEditor->setHolidays(holidays);
@@ -122,15 +114,11 @@ void HolidayDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 									const QModelIndex &index) const
 {
 	GraphicsWidget *graphicEditor = static_cast<GraphicsWidget *>(editor);
-	std::vector<QRect> vec = graphicEditor->getHolidays();
-	QList<QVariant> listOfRectHolidays;
+	std::vector<THoliday> vec = graphicEditor->getHolidays();
+	QList<QVariant> listHolidays;
 	for(auto elem : vec){
-		QRect rec_without_scale(elem);
-		rec_without_scale.setLeft(elem.left()/_scale);
-		rec_without_scale.setRight((elem.right()+2)/_scale);
-		std::cout << "To Model scale = " << _scale << "; begin=" << elem.left()/_scale << "; duration=" << (elem.right() - elem.left() + 2)/_scale << std::endl;
-		listOfRectHolidays.append(rec_without_scale);//.left()/_scale - 1);
+		listHolidays.append(elem.toMap());
 	}
-	model->setData(index, QVariant(listOfRectHolidays), Qt::EditRole);
+	model->setData(index, QVariant(listHolidays), Qt::EditRole);
 }
 

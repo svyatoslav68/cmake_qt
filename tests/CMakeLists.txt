@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(date-tests)
 set(TARGET date_tests)
+set(TARGET1 day_number)
 set(SOURCE_DIR src)
 set(SOURCE_APP ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 # set(SOURCE_APP ../src)
@@ -10,6 +11,7 @@ set(HEADER_DIR $ENV{HOME}/mylib/include)
 set(LIB_DIR $ENV{HOME}/mylib/lib)
 
 add_executable(${TARGET} ${SOURCE_DIR}/date_test.cpp)# ${SOURCE_APP}/str_from_file.cpp)
+add_executable(${TARGET1} ${SOURCE_DIR}/day_number.cpp)# ${SOURCE_APP}/str_from_file.cpp)
 
 # Поиск необходимых для сборок библиотек и заголовочных файлов
 
@@ -35,13 +37,24 @@ target_sources(${TARGET} PUBLIC ${SOURCE_APP}/cl_parametrs.cpp)
 target_sources(${TARGET} PUBLIC ${SOURCE_APP}/functions.cpp)
 
 find_package(Boost REQUIRED COMPONENTS program_options date_time)
+find_package(Qt5 REQUIRED COMPONENTS Core) 
 
 if(Boost_FOUND)
 	message("Boost_INCLUDE_DIRS = " ${Boost_INCLUDE_DIRS})
 	target_link_libraries(${TARGET} ${Boost_LIBRARIES})
+	target_link_libraries(${TARGET1} ${Boost_LIBRARIES})
 	target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIRS})
+	target_include_directories(${TARGET1} PUBLIC ${Boost_INCLUDE_DIRS})
 else()
 	message("Не получится собрать приложение\n, не найден Boost")
+endif()
+
+if(Qt5_FOUND)
+	message("Qt_LIBRARIES = " ${Qt5_LIBRARIES})
+	target_link_libraries(${TARGET1} Qt5::Core)
+else()
+	message("Не получится собрать приложение\n, не найден Qt5")
+	exit()
 endif()
 
 target_include_directories(${TARGET} PUBLIC ${HEADER_DIR})
@@ -51,6 +64,7 @@ target_link_libraries(${TARGET} ${LIB_DIR}/libconnection.a)
 
 set_target_properties(
 	${TARGET} PROPERTIES
+	${TARGET1} PROPERTIES
 	CXX_STANDARD 17	#Собирать в соответствии со стандартом c17
 	C_STANDARD	11
 	)

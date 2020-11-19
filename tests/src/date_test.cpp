@@ -13,9 +13,9 @@ int main() {
 	using namespace boost::gregorian;
 	date d(day_clock::local_day());
 	std::cout << "Сегодня - " << d << std::endl;
-	THoliday h1(-1, 2, "2020-09-02", 15, 2, "");
-	THoliday h2(-1, 2, "2020-09-10", 21, 4, "");
-	THoliday h3(-1, 2, "2020-09-16", 15, 0, "");
+	THoliday h1(-1, "2020-09-02", 15, 2, "");
+	THoliday h2(-1, "2020-09-10", 21, 4, "");
+	THoliday h3(-1, "2020-09-16", 15, 0, "");
 	//h.displayHoliday();
 	std::set<boostdate> set_dates1=h1.datesHoliday();
 	std::set<boostdate> set_dates2=h2.datesHoliday();

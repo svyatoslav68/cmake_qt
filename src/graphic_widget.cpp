@@ -7,58 +7,86 @@
 #include <QBrush>
 #include <QPainter>
 #include <QKeyEvent>
+#include <QRect>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include "tholiday.hpp"
 #include "graphic_widget.hpp"
+using bdd=boost::gregorian::date_duration;
+using bt=boost::gregorian::date;
 
-void GraphicsWidget::setHolidays(const std::vector<QRect> &holidays)
+void GraphicsWidget::setHolidays(const std::vector<THoliday> &holidays)
 {
-	_rectsHoliday = holidays;
+	_holidays = holidays;
 }
 
-std::vector<QRect> GraphicsWidget::getHolidays()
+std::vector<THoliday> GraphicsWidget::getHolidays()
 {
-	return _rectsHoliday;
+	return _holidays;
 }
 
 void GraphicsWidget::paintEvent(QPaintEvent *event)
 {
+	using namespace boost::gregorian;
 	QPainter painter(this);
 	painter.setPen(QPen(Qt::blue, Qt::SolidLine));
 	painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-	painter.drawRect(_rectsHoliday[_currentHoliday]); 
+	THoliday drawHoliday = _holidays[_currentHoliday];
+	//drawHoliday.displayHoliday();
+	QRect rect((drawHoliday.firstDay() - 1)*_scale, 4, (drawHoliday.numberDaysHoliday())*_scale + (drawHoliday.numberDaysTravel())*_scale, 20);
+	painter.drawRect(rect);
+	painter.setPen(QPen(Qt::black, Qt::SolidLine));
+	QString textLengthHoliday = QString("%1%2").arg(drawHoliday.numberDaysHoliday()).arg(drawHoliday.numberDaysTravel()?QString("+%1").arg(drawHoliday.numberDaysTravel()):"");
+	painter.drawText(rect, Qt::AlignCenter, textLengthHoliday); 
+	painter.setPen(QPen(Qt::blue, Qt::SolidLine));
 	painter.setBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
-	painter.drawRect(_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()]); 
+	drawHoliday = _holidays[(_currentHoliday+1)%_holidays.size()];
+	rect = QRect((drawHoliday.firstDay() - 1)*_scale, 4, (drawHoliday.numberDaysHoliday())*_scale + (drawHoliday.numberDaysTravel())*_scale, 20);
+	painter.drawRect(rect);
+	//drawHoliday.displayHoliday();
+	//painter.drawRect(_holidays[(_currentHoliday+1)%_holidays.size()]); 
 }
 
 void GraphicsWidget::keyPressEvent(QKeyEvent *event)
 {
-	//QRect rect = _rectsHoliday[_currentHoliday];
+	//QRect rect = holidays[_currentHoliday];
 	switch (event->key()) {
 		case Qt::Key_Left:
 			if (event->modifiers() & Qt::ShiftModifier){
-				_rectsHoliday[_currentHoliday].setWidth(_rectsHoliday[_currentHoliday].width()-_scale);
-				_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].setWidth(_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].width()+_scale);
+				if (--_holidays[_currentHoliday] == true)
+				//if (event->modifiers() & Qt::ControlModifier)
+					++_holidays[(_currentHoliday+1)%_holidays.size()];
+				//else	
+				//	--_holidays[(_currentHoliday+1)%_holidays.size()];
 			}
 			else
-				_rectsHoliday[_currentHoliday].moveLeft(_rectsHoliday[_currentHoliday].left()-_scale);
+				_holidays[_currentHoliday].setBeginDate(_holidays[_currentHoliday].beginDate()-bdd(1));
 			break;
 		case Qt::Key_Right:
 			if (event->modifiers() & Qt::ShiftModifier){
-				_rectsHoliday[_currentHoliday].setWidth(_rectsHoliday[_currentHoliday].width()+_scale);
-				_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].setWidth(_rectsHoliday[(_currentHoliday +1)%_rectsHoliday.size()].width()-_scale);
+				if (--_holidays[(_currentHoliday+1)%_holidays.size()] == true)
+				++_holidays[_currentHoliday];
 			}
 			else
-				_rectsHoliday[_currentHoliday].moveRight(_rectsHoliday[_currentHoliday].right()+_scale);
+				_holidays[_currentHoliday].setBeginDate(_holidays[_currentHoliday].beginDate()+bdd(1));
 			break;
 		case Qt::Key_Up:
-			_currentHoliday = ++_currentHoliday%_rectsHoliday.size();
-			std::cout << "current holiday: " << _currentHoliday << std::endl;
+			_currentHoliday = ++_currentHoliday%_holidays.size();
+			//std::cout << "current holiday: " << _currentHoliday << std::endl;
 			break;
 		/*case Qt::Key_Return:
 			std::cout << "Press Return\n";
 			break;*/
+		case Qt::Key_Insert:
+			std::cout << "Press Insert\n";
+			break;
 		default:
 			QWidget::keyPressEvent(event);
 	}
 	update();
+}
+
+void GraphicsWidget::toTwo()
+{
+
 }
 
