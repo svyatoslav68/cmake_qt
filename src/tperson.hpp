@@ -16,7 +16,7 @@ public:
 	void displayCard();
 	std::string getFamilyIO() const;
 private:
-	const std::string *templateCardPersonSQL;
+	//const std::string *templateCardPersonSQL;
 	int dataId;		// Идентификатор записи о сотруднике в БД
 	std::string family;
 	std::string name;

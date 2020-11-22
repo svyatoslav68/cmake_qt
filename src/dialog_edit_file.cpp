@@ -17,7 +17,7 @@
 DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
 {
 	setWindowTitle(QString("Содержимое файла %1").arg(name_file.c_str()));
-	personModel = new PersonModel(this);
+	personModel = new PersonModel(PersonModel::TXT, this);
 	buSelectFile = new QPushButton("Выбор файла");
 	buSelectFile->setObjectName("buSelectFile");
 	connect(buSelectFile, &QPushButton::clicked, this, [this](){this->selectFile();});
@@ -33,8 +33,10 @@ DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
 	bottomLayout->addWidget(buOk);
 	bottomLayout->addWidget(buCancel);
 	viewPersons = new QListView();
+	viewPersons->setModel(personModel);
 	edNewPerson = new QLineEdit();
 	buAddPerson = new QPushButton("+");
+	connect(buAddPerson, &QPushButton::clicked, this, [this](){this->addPerson();});
 	buEditPerson = new QPushButton("...");
 	buDeletePerson = new QPushButton("-");
 	QHBoxLayout *personControlLayout = new QHBoxLayout;
@@ -86,7 +88,8 @@ void DialogEditTxtFile::saveToFile()
 
 void DialogEditTxtFile::addPerson()
 {
-
+	personModel->addPerson(-1, "", edNewPerson->text().toStdString());
+	edNewPerson->clear();
 }
 
 void DialogEditTxtFile::deletePerson()
@@ -105,6 +108,14 @@ void DialogEditTxtFile::saveFile()
 
 void DialogEditTxtFile::showDialogHoliday()
 {
+
+}
+
+void DialogEditTxtFile::addHoliday(){
+
+}
+
+void DialogEditTxtFile::deleteHoliday(){
 
 }
 

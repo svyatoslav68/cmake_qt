@@ -23,6 +23,8 @@ public slots:
 private slots:
 	void addPerson();
 	void deletePerson();
+	void addHoliday();
+	void deleteHoliday();
 	void selectFile();
 	void saveFile();
 	void showDialogHoliday();

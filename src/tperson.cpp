@@ -12,11 +12,11 @@
 #include "tperson.hpp"
 
 using std::string;
-TPerson::TPerson():templateCardPersonSQL(nullptr)
+TPerson::TPerson()//:templateCardPersonSQL(nullptr)
 {
 }
 
-TPerson::TPerson(const TPerson &p):templateCardPersonSQL(nullptr)
+TPerson::TPerson(const TPerson &p)//:templateCardPersonSQL(nullptr)
 {
 	//MYSQL_RES *data_from_BD;
 	dataId = p.dataId;
@@ -25,12 +25,13 @@ TPerson::TPerson(const TPerson &p):templateCardPersonSQL(nullptr)
 	parent = p.parent;
 }
 
-TPerson::TPerson(int id):templateCardPersonSQL(nullptr),dataId(id){
-	templateCardPersonSQL = new std::string(ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "TPerson", "getDataPerson"));
+TPerson::TPerson(int id)//:templateCardPersonSQL(nullptr),dataId(id)
+{
+	std::string templateCardPersonSQL(ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "TPerson", "getDataPerson"));
 	MYSQL_RES *data_from_BD;
 	std::stringstream ss;
 	try{
-	boost::format fmter(*templateCardPersonSQL);
+	boost::format fmter(templateCardPersonSQL);
 	ss << fmter%id;
 	}
 	catch (...){
@@ -53,16 +54,13 @@ TPerson::TPerson(int id):templateCardPersonSQL(nullptr),dataId(id){
 		parent = row[3];
 		delete data_from_BD;
 	}
-	delete templateCardPersonSQL;
 }
 
-TPerson::TPerson(int id, string _family, string _name, string _parent):templateCardPersonSQL(nullptr),dataId(id), family(_family), name(_name), parent(_parent){
+TPerson::TPerson(int id, string _family, string _name, string _parent):dataId(id), family(_family), name(_name), parent(_parent){
 }
 
 TPerson::~TPerson()
 {
-	if (!templateCardPersonSQL)
-		delete templateCardPersonSQL;
 }
 
 string TPerson::getFamilyIO() const{

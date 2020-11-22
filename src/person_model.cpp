@@ -42,7 +42,7 @@ PersonModel::PersonModel(MODE mode, QObject *parent):PersonModel(parent) {
 		}
 	}
 	else if (mode == TXT) {
-		ValuesFromXML PersonsFile("holidays.xml");			
+		//ValuesFromXML PersonsFile("holidays.xml");			
 	}
 	else {
 		std::cerr << "Constructor PersonModel executed with incorrect parametrs\n";
@@ -110,3 +110,7 @@ QModelIndex PersonModel::parent ( const QModelIndex & ) const{
 	return QModelIndex();
 }
 
+void PersonModel::addPerson(int codPerson, std::string pos, std::string FIO){
+	std::tuple<int, std::string, std::string>	person {codPerson, pos, FIO};
+	content.push_back(person);
+}

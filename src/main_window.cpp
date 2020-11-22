@@ -139,7 +139,7 @@ void MainWindow::createActions()
 
 void MainWindow::createMenu()
 {
-	menuFile = menuBar()->addMenu("&File");
+	menuFile = menuBar()->addMenu("&Файл");
 	menuFile->addAction(actCreateTxt);
 	menuFile->addAction(actLoadFromBD);
 	menuFile->addAction(actLoadFromTxt);
@@ -147,18 +147,18 @@ void MainWindow::createMenu()
 	menuFile->addAction(actSaveToTxt);
 	menuFile->addSeparator();
 	menuFile->addAction(actExit);
-	menuView = menuBar()->addMenu("Вид");
+	menuView = menuBar()->addMenu("&Вид");
 	menuView->addAction(actPlan);
 	menuView->addAction(actResult);
 	menuView->addAction(actBackGround);
 	menuView->addSeparator();
-	menuScale = menuView->addMenu("Масштаб");
+	menuScale = menuView->addMenu("&Масштаб");
 	menuScale->addAction(act1x);
 	menuScale->addAction(act2x);
 	menuScale->addAction(act3x);
 	menuView->addSeparator();
 	menuView->addAction(actRefresh);
-	menuSettings = menuBar()->addMenu("Настройки");
+	menuSettings = menuBar()->addMenu("&Настройки");
 	menuSettings->addAction(actConditions);
 	menuSettings->addAction(actUnit);
 	menuSettings->addAction(actSetColors);
@@ -236,7 +236,9 @@ void MainWindow::slotLoadFromBD()
 
 void MainWindow::showDialogSelectFile()
 {
-
+	DialogEditTxtFile dialogTxtFile;
+	if (dialogTxtFile.exec() == QDialog::Accepted){
+	}
 }
 
 void MainWindow::showDialogEditFile()

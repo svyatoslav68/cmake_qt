@@ -13,6 +13,7 @@ public:
 	explicit HolidayView(const int year, QWidget *parent = nullptr, const int scale = 2);
 	void setSizeColumns();
 private:
+	QHeaderView *horHeader;
 	const int _year;
 	const int _scale;
 };

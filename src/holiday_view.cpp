@@ -8,6 +8,7 @@
 
 HolidayView::HolidayView(const int year, QWidget *parent, const int scale):QTableView(parent), _year(year), _scale(scale)
 {
+	horHeader = horizontalHeader();
 }
 
 void HolidayView::setSizeColumns(){

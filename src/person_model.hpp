@@ -12,6 +12,7 @@ public:
 	PersonModel(QObject *parent = nullptr);
 	PersonModel(MODE mode, QObject *parent = nullptr);
 	virtual ~PersonModel();
+	/*  Переопределяемые методы *****/
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 	QVariant headerData(int section, Qt::Orientation, int role) const;
@@ -19,6 +20,8 @@ public:
 	int columnCount(const QModelIndex&) const;
 	QModelIndex index ( int row, int column, const QModelIndex &parent = QModelIndex()) const;
 	QModelIndex parent ( const QModelIndex & ) const;
+	/*********************************/
+	void addPerson(int codPerson, std::string pos, std::string FIO);
 private:
 	static const int COLUMN_COUNT = 3;
 	const std::string Template_SQL_Fill;
