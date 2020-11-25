@@ -3,6 +3,7 @@
  *		   состава. PersonModel.           *
  *		   Файл: person_model.hpp          *
  ******************************************/
+#include <QAbstractItemModel>
 #pragma once
 class TPerson;
 class PersonModel : public QAbstractItemModel{
@@ -22,9 +23,11 @@ public:
 	QModelIndex parent ( const QModelIndex & ) const;
 	/*********************************/
 	void addPerson(int codPerson, std::string pos, std::string FIO);
+	std::vector<std::tuple<int, std::string, std::string>> getContent() {return content;}
 private:
 	static const int COLUMN_COUNT = 3;
 	const std::string Template_SQL_Fill;
+protected:
 	std::vector<std::tuple<int, std::string, std::string>> content;
 };
 

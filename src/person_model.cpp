@@ -113,4 +113,5 @@ QModelIndex PersonModel::parent ( const QModelIndex & ) const{
 void PersonModel::addPerson(int codPerson, std::string pos, std::string FIO){
 	std::tuple<int, std::string, std::string>	person {codPerson, pos, FIO};
 	content.push_back(person);
+	emit dataChanged(createIndex(content.size() - 1, 0), createIndex(content.size() - 1, 0));
 }

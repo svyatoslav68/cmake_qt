@@ -9,15 +9,16 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <QFileDialog>
+#include <str_from_file.hpp>
 #include "tholiday.hpp"
 #include "tperson.hpp"
-#include "person_model.hpp"
+#include "person_list_model.hpp"
 #include "dialog_edit_file.hpp"
 
 DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
 {
 	setWindowTitle(QString("Содержимое файла %1").arg(name_file.c_str()));
-	personModel = new PersonModel(PersonModel::TXT, this);
+	personModel = new PersonListModel(PersonModel::TXT, this);
 	buSelectFile = new QPushButton("Выбор файла");
 	buSelectFile->setObjectName("buSelectFile");
 	connect(buSelectFile, &QPushButton::clicked, this, [this](){this->selectFile();});
@@ -104,6 +105,12 @@ void DialogEditTxtFile::selectFile()
 
 void DialogEditTxtFile::saveFile()
 {
+	PersonsFile file(name_file.c_str());
+	file.savePersons(personModel->getContent());
+	for (auto [id, position, fio] : personModel->getContent()){
+		const char * str_position = position.size()?std::string(" "+position).c_str():""; 
+		std::cout << id << ":" << str_position << fio.c_str() << std::endl;
+	}
 }
 
 void DialogEditTxtFile::showDialogHoliday()
