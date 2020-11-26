@@ -47,6 +47,7 @@ target_sources(${TARGET} PUBLIC ${SOURCE_APP}/functions.cpp)
 target_include_directories(${TARGET_DIALOG} PUBLIC ${SOURCE_APP})
 target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/cl_parametrs.cpp)
 target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/dialog_edit_file.cpp)
+target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/person_list_model.cpp)
 target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/person_model.cpp)
 
 find_package(Boost REQUIRED COMPONENTS program_options date_time)
