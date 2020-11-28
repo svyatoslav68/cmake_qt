@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FILE>
-	<Persons>
-	</Persons>
+    <Persons>
+        <1>
+            <id>-1</id>
+            <position/>
+            <fio>wrqwrqw</fio>
+        </1>
+        <2>
+            <id>-1</id>
+            <position/>
+            <fio>tyutyuytu</fio>
+        </2>
+        <3>
+            <id>-1</id>
+            <position/>
+            <fio>werwr2342</fio>
+        </3>
+    </Persons>
 </FILE>
-

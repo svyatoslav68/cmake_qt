@@ -25,7 +25,7 @@ private slots:
 	void deletePerson();
 	void addHoliday();
 	void deleteHoliday();
-	void selectFile();
+	std::string selectFile();
 	void saveFile();
 	void showDialogHoliday();
 private:

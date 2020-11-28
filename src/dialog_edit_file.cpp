@@ -98,13 +98,21 @@ void DialogEditTxtFile::deletePerson()
 
 }
 
-void DialogEditTxtFile::selectFile()
+std::string DialogEditTxtFile::selectFile()
 {
 	name_file = QFileDialog::getOpenFileName(this, "Выбор файла", "./", "XML (*.xml)").toStdString();
+	PersonsFile file(name_file.c_str());
+	std::vector<PersonsFile::employee> v = file.getPersons();
+	for (auto p : v ){
+		//std::cout << "Employee: " << p.id_employee << ":" << p.family << std::endl;
+		personModel->addPerson(p.id_employee, p.position, p.family);
+	}
+	return name_file;
 }
 
 void DialogEditTxtFile::saveFile()
 {
+	bool openFile = false;
 	PersonsFile file(name_file.c_str());
 	file.savePersons(personModel->getContent());
 	for (auto [id, position, fio] : personModel->getContent()){
