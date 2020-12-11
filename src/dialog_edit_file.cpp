@@ -19,9 +19,12 @@ DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
 {
 	setWindowTitle(QString("Содержимое файла %1").arg(name_file.c_str()));
 	personModel = new PersonListModel(PersonModel::TXT, this);
-	buSelectFile = new QPushButton("Выбор файла");
+	buSelectFile = new QPushButton("Загрузить из файла");
 	buSelectFile->setObjectName("buSelectFile");
 	connect(buSelectFile, &QPushButton::clicked, this, [this](){this->selectFile();});
+	buLoadBD = new QPushButton("Загрузить из БД");
+	buLoadBD->setObjectName("buLoadBD");
+	connect(buLoadBD, &QPushButton::clicked, this, [this](){this->slotLoadBD();});
 	buSave = new QPushButton("Сохранить");
 	connect(buSave, &QPushButton::clicked, this, [this](){this->saveFile();});
 	buOk = new QPushButton("Ok");
@@ -30,6 +33,7 @@ DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
 	QHBoxLayout *bottomLayout = new QHBoxLayout;
 	bottomLayout->addWidget(buSave);
 	bottomLayout->addWidget(buSelectFile);
+	bottomLayout->addWidget(buLoadBD);
 	bottomLayout->addStretch();
 	bottomLayout->addWidget(buOk);
 	bottomLayout->addWidget(buCancel);
@@ -40,6 +44,7 @@ DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
 	connect(buAddPerson, &QPushButton::clicked, this, [this](){this->addPerson();});
 	buEditPerson = new QPushButton("...");
 	buDeletePerson = new QPushButton("-");
+	connect(buDeletePerson, &QPushButton::clicked, this, [this](){this->deletePerson();});
 	QHBoxLayout *personControlLayout = new QHBoxLayout;
 	personControlLayout->addWidget(buAddPerson);
 	personControlLayout->addWidget(buEditPerson);
@@ -95,7 +100,7 @@ void DialogEditTxtFile::addPerson()
 
 void DialogEditTxtFile::deletePerson()
 {
-
+	personModel->removeRows(viewPersons->currentIndex().row(), 1);
 }
 
 std::string DialogEditTxtFile::selectFile()
@@ -115,6 +120,8 @@ void DialogEditTxtFile::saveFile()
 	bool openFile = false;
 	PersonsFile file(name_file.c_str());
 	file.savePersons(personModel->getContent());
+	std::cout << "В файл: " << name_file << "\n";
+	std::cout << "Мы пытались сохранить следующее:\n";
 	for (auto [id, position, fio] : personModel->getContent()){
 		const char * str_position = position.size()?std::string(" "+position).c_str():""; 
 		std::cout << id << ":" << str_position << fio.c_str() << std::endl;
@@ -131,6 +138,11 @@ void DialogEditTxtFile::addHoliday(){
 }
 
 void DialogEditTxtFile::deleteHoliday(){
+
+}
+
+void DialogEditTxtFile::slotLoadBD()
+{
 
 }
 

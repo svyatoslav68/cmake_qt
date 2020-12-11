@@ -4,6 +4,7 @@ project(date-tests)
 set(TARGET date_tests)
 set(TARGET1 day_number)
 set(TARGET_DIALOG dialog)
+set(TARGET_XML test_xml)
 set(SOURCE_DIR src)
 set(SOURCE_APP ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 # set(SOURCE_APP ../src)
@@ -17,6 +18,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(${TARGET} ${SOURCE_DIR}/date_test.cpp)# ${SOURCE_APP}/str_from_file.cpp)
 add_executable(${TARGET1} ${SOURCE_DIR}/day_number.cpp)# ${SOURCE_APP}/str_from_file.cpp)
 add_executable(${TARGET_DIALOG} ${SOURCE_DIR}/test_personmodel.cpp)# ${SOURCE_APP}/str_from_file.cpp)
+add_executable(${TARGET_XML} ${SOURCE_DIR}/xml_test.cpp)
 
 # Поиск необходимых для сборок библиотек и заголовочных файлов
 
@@ -58,6 +60,7 @@ if(Boost_FOUND)
 	target_link_libraries(${TARGET} ${Boost_LIBRARIES})
 	target_link_libraries(${TARGET1} ${Boost_LIBRARIES})
 	target_link_libraries(${TARGET_DIALOG} ${Boost_LIBRARIES})
+	target_link_libraries(${TARGET_XML} ${Boost_LIBRARIES})
 	target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIRS})
 	target_include_directories(${TARGET1} PUBLIC ${Boost_INCLUDE_DIRS})
 	target_include_directories(${TARGET_DIALOG} PUBLIC ${Boost_INCLUDE_DIRS})
@@ -102,4 +105,9 @@ set_target_properties(
 	${TARGET_DIALOG} PROPERTIES
 	CXX_STANDARD 17	#Собирать в соответствии со стандартом c17
 	C_STANDARD	11
+	)
+
+set_target_properties(
+	${TARGET_XML} PROPERTIES
+	CXX_STANDARD 17
 	)

@@ -110,6 +110,17 @@ QModelIndex PersonModel::parent ( const QModelIndex & ) const{
 	return QModelIndex();
 }
 
+bool PersonModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+	beginRemoveRows(QModelIndex(), row, row+count - 1);
+	auto it = content.cbegin();
+	for (int i = 0; i < count; ++i){
+		content.erase(it+i);
+	}
+	endRemoveRows();
+	return true;
+}
+
 void PersonModel::addPerson(int codPerson, std::string pos, std::string FIO){
 	std::tuple<int, std::string, std::string>	person {codPerson, pos, FIO};
 	content.push_back(person);

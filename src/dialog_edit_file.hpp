@@ -26,12 +26,14 @@ private slots:
 	void addHoliday();
 	void deleteHoliday();
 	std::string selectFile();
+	void slotLoadBD();
 	void saveFile();
 	void showDialogHoliday();
 private:
 	QListView *viewPersons;
 	QListView *viewHolidays;
 	QLineEdit *edNewPerson;
+	QPushButton *buLoadBD;
 	QPushButton *buSelectFile;
 	QPushButton *buOk, *buCancel, *buSave, *buAddPerson, *buDeletePerson, *buEditPerson;
 	QPushButton *buAddHoliday, *buDeleteHoliday, *buEditHoliday;

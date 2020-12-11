@@ -21,6 +21,7 @@ public:
 	int columnCount(const QModelIndex&) const;
 	QModelIndex index ( int row, int column, const QModelIndex &parent = QModelIndex()) const;
 	QModelIndex parent ( const QModelIndex & ) const;
+	bool removeRows(int row, int count = 1, const QModelIndex &parent = QModelIndex());
 	/*********************************/
 	void addPerson(int codPerson, std::string pos, std::string FIO);
 	std::vector<std::tuple<int, std::string, std::string>> getContent() {return content;}
