@@ -27,6 +27,8 @@ using std::vector;
 using std::map;
 using std::string;
 
+extern clParametrs appParametrs;
+
 //const string HolidayTableModel::Template_SQL_Fill =  ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "ListPerson", "getListPersonsUnit");
 
 /*HolidayTableModel::HolidayTableModel(vector<std::string> persons):
@@ -107,9 +109,7 @@ QVariant HolidayTableModel::data(const QModelIndex &index, int role) const{
 	return QVariant();
 }
 
-QVariant HolidayTableModel::headerData(int section, Qt::Orientation orientation, int role) const{
-	/*if (role != Qt::DisplayRole)
-		return QVariant();*/
+/*QVariant HolidayTableModel::headerData(int section, Qt::Orientation orientation, int role) const{
 	if (role == Qt::DisplayRole){
 	if (orientation == Qt::Horizontal){
 		switch (section){
@@ -121,7 +121,7 @@ QVariant HolidayTableModel::headerData(int section, Qt::Orientation orientation,
 	}
 	}
 	return QVariant();
-}
+}*/
 
 int HolidayTableModel::rowCount(const QModelIndex &index) const{
 	return index.isValid() ? 0 : content.size();

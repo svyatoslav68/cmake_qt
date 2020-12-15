@@ -14,9 +14,9 @@ public:
 	explicit HolidayHeader(QWidget *parent = nullptr);
 private:
 	void paintEvent(QPaintEvent *event);
-	void paintHeader(QPainter *painter, const int RowHeight);
+	//void paintHeader(QPainter *painter, const int RowHeight);
 	std::array<int, 12> daysInMonth;
-	std::array<std::string, 12> namesMonth = {"Янв.","Фев.","Мар.", "Апр.", "Май", "Июнь", "Июль", "Авг.", "Сен.", "Окт.", "Ноя.", "Дек."};
+	const std::array<std::string, 12> namesMonth = {"Янв.","Фев.","Мар.", "Апр.", "Май", "Июнь", "Июль", "Авг.", "Сен.", "Окт.", "Ноя.", "Дек."};
 };
 
 class HolidayView : public QTableView{

@@ -3,7 +3,6 @@
 ***      Файл tperson.hpp                 **
 *******************************************/
 #pragma once
-extern clParametrs appParametrs;
 
 class TPerson {
 public:

@@ -15,6 +15,8 @@
 #include "tperson.hpp"
 #include "person_model.hpp"
 
+extern clParametrs appParametrs;
+
 PersonModel::PersonModel(QObject *parent):QAbstractItemModel(parent),Template_SQL_Fill(ValuesFromXML(appParametrs.getNameConfFile().c_str()).
 	getStrSQL("FILE.SQL", "ListPerson", "getMilitaryPersonsUnit")){
 }

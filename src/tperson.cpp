@@ -11,6 +11,8 @@
 #include "cl_parametrs.hpp"
 #include "tperson.hpp"
 
+extern clParametrs appParametrs;
+
 using std::string;
 TPerson::TPerson()//:templateCardPersonSQL(nullptr)
 {
