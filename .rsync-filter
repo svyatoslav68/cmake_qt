@@ -6,3 +6,5 @@
 - /.build
 - /cmake_modules/
 - /.git
+- /oldfiles/
+- /local_src/

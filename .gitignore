@@ -4,6 +4,10 @@
 .DS_Store
 .git
 
+# Directory of temp files
+oldfiles
+local_src
+
 # Files of cmake
 CMakeScripts
 CMakeFiles
