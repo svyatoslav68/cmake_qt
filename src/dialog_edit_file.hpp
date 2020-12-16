@@ -11,12 +11,14 @@ class QListView;
 class QLineEdit;
 class PersonModel;
 class QPushButton;
+class HolidayListModel;
 
 
 class DialogEditTxtFile : public QDialog{
 	Q_OBJECT
 public:
-	DialogEditTxtFile(QWidget *parent = nullptr);
+	enum MODE {SQL, TXT};
+	explicit DialogEditTxtFile(MODE source, QWidget *parent = nullptr);
 	virtual ~DialogEditTxtFile();
 public slots:
 	void saveToFile();
@@ -30,6 +32,7 @@ private slots:
 	void saveFile();
 	void showDialogHoliday();
 private:
+	MODE source;
 	QListView *viewPersons;
 	QListView *viewHolidays;
 	QLineEdit *edNewPerson;
@@ -38,6 +41,7 @@ private:
 	QPushButton *buOk, *buCancel, *buSave, *buAddPerson, *buDeletePerson, *buEditPerson;
 	QPushButton *buAddHoliday, *buDeleteHoliday, *buEditHoliday;
 	PersonModel *personModel;
+	HolidayListModel *holidaysModel;
 	std::string name_file;	
 };
 

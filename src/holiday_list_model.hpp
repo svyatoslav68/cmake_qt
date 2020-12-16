@@ -5,9 +5,8 @@
 ************************************************************/
 #pragma once
 
-#include "holiday_table_model.hpp"
-#include "tholiday.hpp"
-
+//#include "tholiday.hpp"
+class THoliday;
 class QModelIndex;
 
 class HolidayListModel: public QAbstractItemModel {
@@ -15,7 +14,7 @@ class HolidayListModel: public QAbstractItemModel {
 public:
 	enum MODE {SQL, TXT};
 	/*HolidayTableModel(std::vector<std::string> persons);*/
-	explicit HolidayListModel(MODE mode, int row);
+	explicit HolidayListModel(int row, int cod_person, MODE mode = TXT);
 	~HolidayListModel() {}
 	/* Методы QAbstractItemModel, которые необходимо переопределять *********
 	 * в классе-потомке            *****************************************/

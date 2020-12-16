@@ -13,12 +13,21 @@
 #include "tholiday.hpp"
 #include "tperson.hpp"
 #include "person_list_model.hpp"
+#include "holiday_list_model.hpp"
 #include "dialog_edit_file.hpp"
 
-DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
+DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):source(source)
 {
-	setWindowTitle(QString("Содержимое файла %1").arg(name_file.c_str()));
-	personModel = new PersonListModel(PersonModel::TXT, this);
+	viewPersons = new QListView();
+	if (source == TXT){
+		setWindowTitle(QString("Содержимое файла %1").arg(name_file.c_str()));
+		personModel = new PersonListModel(PersonModel::TXT, this);
+		viewPersons->setModel(personModel);
+	}
+	else if (source == SQL) {
+		setWindowTitle(QString("Содержимое БД"));
+		personModel = new PersonListModel(PersonModel::SQL, this);
+	}
 	buSelectFile = new QPushButton("Загрузить из файла");
 	buSelectFile->setObjectName("buSelectFile");
 	connect(buSelectFile, &QPushButton::clicked, this, [this](){this->selectFile();});
@@ -37,8 +46,6 @@ DialogEditTxtFile::DialogEditTxtFile(QWidget *parent)
 	bottomLayout->addStretch();
 	bottomLayout->addWidget(buOk);
 	bottomLayout->addWidget(buCancel);
-	viewPersons = new QListView();
-	viewPersons->setModel(personModel);
 	edNewPerson = new QLineEdit();
 	buAddPerson = new QPushButton("+");
 	connect(buAddPerson, &QPushButton::clicked, this, [this](){this->addPerson();});
@@ -105,7 +112,13 @@ void DialogEditTxtFile::deletePerson()
 
 std::string DialogEditTxtFile::selectFile()
 {
-	name_file = QFileDialog::getOpenFileName(this, "Выбор файла", "./", "XML (*.xml)").toStdString();
+	source = TXT;
+	if (personModel){
+		delete personModel;
+	}
+	personModel = new PersonListModel(PersonModel::TXT, this);
+	viewPersons->setModel(personModel);
+	name_file = QFileDialog::getOpenFileName(this, "Выбор файла", "", "XML (*.xml)").toStdString();
 	PersonsFile file(name_file.c_str());
 	std::vector<PersonsFile::employee> v = file.getPersons();
 	for (auto p : v ){
@@ -143,6 +156,11 @@ void DialogEditTxtFile::deleteHoliday(){
 
 void DialogEditTxtFile::slotLoadBD()
 {
-
+	source = SQL;
+	if (personModel){
+		delete personModel;
+	}
+	personModel = new PersonListModel(PersonModel::SQL, this);
+	viewPersons->setModel(personModel);
 }
 

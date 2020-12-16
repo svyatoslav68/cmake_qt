@@ -236,14 +236,14 @@ void MainWindow::slotLoadFromBD()
 
 void MainWindow::showDialogSelectFile()
 {
-	DialogEditTxtFile dialogTxtFile;
+	DialogEditTxtFile dialogTxtFile(DialogEditTxtFile::TXT);
 	if (dialogTxtFile.exec() == QDialog::Accepted){
 	}
 }
 
 void MainWindow::showDialogEditFile()
 {
-	DialogEditTxtFile dialogFile;
+	DialogEditTxtFile dialogFile(DialogEditTxtFile::TXT);
 	if (dialogFile.exec() == QDialog::Accepted){
 		dialogFile.saveToFile();
 	}
