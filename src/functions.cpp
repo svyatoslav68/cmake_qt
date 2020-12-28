@@ -5,6 +5,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include "functions.hpp"
 
+namespace my_functions {
 std::vector<boost::gregorian::date_period> setToPeriods(std::set<boost::gregorian::date> input_set){
 	std::vector<boost::gregorian::date_period> result;
 	using boost_date = boost::gregorian::date;
@@ -52,3 +53,4 @@ std::vector<boost::gregorian::date_period> setToPeriods(std::set<boost::gregoria
 	}*/
 	return result;
 }
+} // namespace my_functions

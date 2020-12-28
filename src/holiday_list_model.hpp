@@ -6,15 +6,17 @@
 #pragma once
 
 //#include "tholiday.hpp"
+//#include <QAbstractItemModel>
+#include "holiday_table_model.hpp"
 class THoliday;
 class QModelIndex;
 
-class HolidayListModel: public QAbstractItemModel {
+class HolidayListModel: public HolidayTableModel {
 	Q_OBJECT
 public:
 	enum MODE {SQL, TXT};
 	/*HolidayTableModel(std::vector<std::string> persons);*/
-	explicit HolidayListModel(int row, int cod_person, MODE mode = TXT, QObject *parent = nullptr);
+	explicit HolidayListModel(int row, int cod_person, MODE mode = TXT);
 	~HolidayListModel() {}
 	/* Методы QAbstractItemModel, которые необходимо переопределять *********
 	 * в классе-потомке            *****************************************/
@@ -26,18 +28,12 @@ public:
 	QModelIndex index ( int row, int column, const QModelIndex &) const;
 	QModelIndex parent ( const QModelIndex & ) const;
 	/***********************************************************************/
+	void printContent();
 public slots:
 	void loadFromTxt();
 	void loadFromBd();
 private:
 	int indexRow;
-	static std::map<
-		int,
-		std::tuple<
-			int, // idPerson
-			std::vector<THoliday> // Вектор отпусков сотрудника
-		>
-	> content;
 private slots:
 	void clearContent();
 };

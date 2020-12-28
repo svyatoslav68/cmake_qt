@@ -29,6 +29,7 @@ PersonModel::PersonModel(MODE mode, QObject *parent):PersonModel(parent) {
 		std::string SQL = ss.str();
 		int mysql_status = 0;
 		mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
+		std::cout << "SQL = " << SQL.c_str() << std::endl;
 		if (mysql_status){
 			std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
 		}

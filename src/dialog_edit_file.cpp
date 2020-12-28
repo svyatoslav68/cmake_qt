@@ -23,7 +23,7 @@ DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):source(source
 		setWindowTitle(QString("Содержимое файла: %1").arg(name_file.c_str()));
 		personModel = new PersonListModel(PersonModel::TXT, this);
 		viewPersons->setModel(personModel);
-		connect(viewPersons, &QListView::clicked, this, [this](const QModelIndex &index){this->changeIndexPerson(index);});
+		connect(viewPersons, &QListView::clicked, this, [this](const QModelIndex &index){this->changeIndexPerson(viewPersons->currentIndex());});
 	}
 	else if (source == SQL) {
 		setWindowTitle(QString("Содержимое БД"));
@@ -166,7 +166,9 @@ void DialogEditTxtFile::changeIndexPerson(const QModelIndex &index)
 {
 	if (holidaysModel)
 		delete holidaysModel;
-	std::cout << "row = " << index.row() << std::endl;
-	holidaysModel = new HolidayListModel(index.row(), 2, HolidayListModel::SQL, this);
+	//QModelIndex modifyIndex = index.siblingAtColumn(PersonModel::ID);
+	std::cout << "row = " << index.row() << ", column = " << index.column() << ", id = " << personModel->PersonModel::data(index, Qt::DisplayRole).toInt() << std::endl;
+	holidaysModel = new HolidayListModel(index.row(), personModel->PersonModel::data(index, Qt::DisplayRole).toInt(), HolidayListModel::SQL);
 	viewHolidays->setModel(holidaysModel);
+	holidaysModel->printContent();
 }

@@ -95,7 +95,7 @@ QVariant HolidayTableModel::data(const QModelIndex &index, int role) const{
 	if (role == Qt::DecorationRole) {
 		if (index.column() == Holidays){
 			QList<QVariant> list_periods;
-			for (auto period : setToPeriods(*(std::get<3>(content.at(index.row()))))){
+			for (auto period : my_functions::setToPeriods(*(std::get<3>(content.at(index.row()))))){
 				QMap<QString, QVariant> map_period { {"begin_day", QVariant(period.begin().day_of_year())},
 													 {"number_days", QVariant(qlonglong(period.length().days()))}
 				};

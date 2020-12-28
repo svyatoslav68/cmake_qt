@@ -51,6 +51,10 @@
                 <description>Запрос возвращает планируемый отпуск по коду отпуска</description>
                 <query>SELECT p.id_otpusk as id, t.name_type as name_type, p.cod_person as person, p.plan_begin as date_begin, p.plan_size as size, p.plan_time_travel as duration FROM plan_otpusk p, types_otpusk t WHERE t.id_type_otpusk=p.cod_type AND p.id_otpusk=%d;</query>
             </getHoliday>
+            <updateHoliday>
+                <description>Шаблон запроса для обновления данных планируемого отпуска</description>
+                <query>UPDATE plan_otpusk SET plan_begin = &apos;%s&apos;, plan_size = %d, plan_time_travel = %d WHERE id_otpusk = %d;</query>
+            </updateHoliday>
         </THoliday>
         <HolidayTableModel>
             <getAllHolidays>
@@ -75,17 +79,41 @@
         <year>2020</year>
     </SettingsApplication>
     <Groups>
-        <All>
-            <member>2</member>
-            <member>10</member>
+        <Keys>
+            <member>147</member>
+            <member>148</member>
+            <condition>great 1</condition>
+        </Keys>
+        <Smena>
+            <member>25</member>
+            <member>147</member>
             <member>148</member>
             <member>151</member>
-            <condition>less 3</condition>
-        </All>
-        <Duty>
+            <member>152</member>
+            <member>153</member>
+            <member>157</member>
+            <member>159</member>
+            <member>161</member>
+            <member>172</member>
+            <member>220</member>
+            <member>230</member>
+            <member>233</member>
+            <member>244</member>
+            <member>253</member>
+            <member>2</member>
             <member>10</member>
-            <member>148</member>
-            <condition>equal 1</condition>
-        </Duty>
+            <member>156</member>
+            <condition>great 3</condition>
+        </Smena>
+        <Head>
+            <member>2</member>
+            <member>10</member>
+            <condition>great 1</condition>
+        </Head>
+        <Material>
+            <member>253</member>
+            <member>159</member>
+            <condition>great 1</condition>
+        </Material>
     </Groups>
 </FILE>

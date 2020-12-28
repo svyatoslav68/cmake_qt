@@ -35,7 +35,7 @@ using namespace boost::gregorian;
 		row = mysql_fetch_row(data_from_BD);
 		name_holiday = row[1];
 		/*cod_person = boost::lexical_cast<int>(row[2]);		*/
-		date_begin = from_simple_string(std::string(row[3]));
+		m_date_begin = from_simple_string(std::string(row[3]));
 		holiday_duration = date_duration(boost::lexical_cast<int>(row[4]));
 		travel_duration = date_duration(boost::lexical_cast<int>(row[5]));
 	}
@@ -49,7 +49,7 @@ THoliday::THoliday(QVariant varHoliday)
 	gregorian_calendar::ymd_type ymd = gregorian_calendar::from_day_number(mapHoliday["begin"].toInt());
 	date load_date = { ymd.year, ymd.month, ymd.day };
 	//std::cout << "date = " << load_date << std::endl;
-	date_begin = load_date;
+	m_date_begin = load_date;
 	holiday_duration = bdd(mapHoliday["duration"].toInt());
 	travel_duration = bdd(mapHoliday["travel"].toInt());
 }
@@ -58,7 +58,7 @@ void THoliday::displayHoliday() const {
 using namespace boost::gregorian;
 	date_facet *facet(new date_facet("%d.%m.%Y"));
 	std::cout.imbue(std::locale(std::cout.getloc(), facet));
-	std::cout << std::setw(40) << std::setfill(' ') << std::left << name_holiday << std::setw(13) << date_begin << std::setw(3) << std::right << holiday_duration << std::endl;
+	std::cout << std::setw(40) << std::setfill(' ') << std::left << name_holiday << std::setw(13) << m_date_begin << std::setw(3) << std::right << holiday_duration << std::endl;
 }
 
 THoliday& THoliday::operator+=(const int numdays){
@@ -96,12 +96,12 @@ bool THoliday::operator==(const bool x){
 }
 THoliday& THoliday::move(int number_days)
 {
-	date_begin += bdd(number_days);
+	m_date_begin += bdd(number_days);
 	return *this;
 }
 
 bd THoliday::beginDate() const{
-	return date_begin;
+	return m_date_begin;
 }
 
 int THoliday::getCodHoliday() const{
@@ -109,18 +109,14 @@ int THoliday::getCodHoliday() const{
 }
 
 int THoliday::firstDay() const{
-	return date_begin.day_of_year();
+	return m_date_begin.day_of_year();
 }
 
 QVariant THoliday::toMap() const{
-	QMap<QString, QVariant> resultMap { {QString("begin"), QVariant(date_begin.day_number())},
+	QMap<QString, QVariant> resultMap { {QString("begin"), QVariant(m_date_begin.day_number())},
 									{QString("duration"), QVariant(static_cast<int>(holiday_duration.days()))},
 									{QString("travel"), QVariant(static_cast<int>(travel_duration.days()))}
 	};
-	/*std::cout << "From toMap():\n";
-	std::cout << "begin = " << resultMap["begin"].toInt() << std::endl;
-	std::cout << "duration = " << resultMap["duration"].toInt() << std::endl;
-	std::cout << "travel = " << resultMap["travel"].toInt() << std::endl;*/
 	return QVariant(resultMap);
 }
 
@@ -135,7 +131,7 @@ int THoliday::numberDaysTravel() const{
 std::set<bd> THoliday::datesHoliday() const{
 	using namespace boost::gregorian;
 	std::set<bd> result;
-	date_period holiday_period(date_begin, holiday_duration + travel_duration);
+	date_period holiday_period(m_date_begin, holiday_duration + travel_duration);
 	//std::cout << "holiday_period = " << holiday_period << std::endl;
 	day_iterator di(holiday_period.begin());
 	while (di != holiday_period.end()){
@@ -148,7 +144,7 @@ std::set<bd> THoliday::datesHoliday() const{
 std::set<int> THoliday::numbersDayHoliday() const{
 	using namespace boost::gregorian;
 	std::set<int> result;
-	date_period holiday_period(date_begin, holiday_duration + travel_duration);
+	date_period holiday_period(m_date_begin, holiday_duration + travel_duration);
 	day_iterator di(holiday_period.begin());
 	while (di != holiday_period.end()){
 		result.insert(di->day_of_year());
@@ -161,9 +157,9 @@ std::set<int> THoliday::numbersDayHoliday() const{
 THoliday &THoliday::moveTo(int dayInYear)
 {
 	using namespace boost::gregorian;
-	greg_year year_holiday = date_begin.year();
+	greg_year year_holiday = m_date_begin.year();
 	date first_day_year(year_holiday, 1, 1);
-	date_begin = date_begin + date_duration(dayInYear);
+	m_date_begin = m_date_begin + date_duration(dayInYear);
 	return *this;
 }
 

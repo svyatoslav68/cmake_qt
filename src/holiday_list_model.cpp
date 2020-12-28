@@ -15,9 +15,9 @@
 
 extern clParametrs appParametrs;
 
-std::map<int, std::tuple<int, std::vector<THoliday>>> HolidayListModel::content;
+//std::map<int, std::tuple<int, std::vector<THoliday>>> HolidayListModel::content;
 
-HolidayListModel::HolidayListModel(int row, int cod_person,  MODE mode, QObject *parent):QAbstractItemModel(parent), indexRow(row)
+HolidayListModel::HolidayListModel(int row, int cod_person,  MODE mode):HolidayTableModel(), indexRow(row)
 {
 	if (mode == SQL) {
 		std::string template_SQL_for_Fill = ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "THoliday", "getPersonHolidays");
@@ -34,14 +34,14 @@ HolidayListModel::HolidayListModel(int row, int cod_person,  MODE mode, QObject 
 		else {
 			data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
 			MYSQL_ROW row_holiday;
-			std::vector<THoliday> vectorOfHolidays;
+			std::vector<THoliday> *vectorOfHolidays = new std::vector<THoliday>();
 			row_holiday = mysql_fetch_row(data_from_BD);
 			while (row_holiday){ 
 				THoliday newHoliday(boost::lexical_cast<int>(row_holiday[0]), row_holiday[2], boost::lexical_cast<int>(row_holiday[3]), boost::lexical_cast<int>(row_holiday[4]), row_holiday[1]);
-				vectorOfHolidays.push_back(newHoliday);
+				vectorOfHolidays->push_back(newHoliday);
 				row_holiday = mysql_fetch_row(data_from_BD);
 			}
-			content[row] = std::make_tuple(cod_person, vectorOfHolidays);
+			content[row] = std::make_tuple(cod_person, std::string(""), vectorOfHolidays, nullptr);
 		}
 	}
 	else if (mode == TXT) {
@@ -67,19 +67,23 @@ bool HolidayListModel::setData(const QModelIndex &index, const QVariant &value, 
 QVariant HolidayListModel::data(const QModelIndex &index, int role) const
 {
 	const int& key = indexRow;
-	if (!index.isValid() || index.row() < 0 || index.row() > content.size()
+	if (!index.isValid() || index.row() < 0 || index.row() > std::get<2>(content.at(key))->size() - 1
 		|| index.column() < 0 || index.column() > 1)
 		return QVariant();
 	if (role == Qt::DisplayRole){
-		std::vector<THoliday> vectorOfHolidays = std::get<1>(content.at(key));
-		return vectorOfHolidays.at(index.row()).toMap();
+		using namespace boost::gregorian;
+		std::vector<THoliday> *vectorOfHolidays = std::get<2>(content.at(key));
+		QVariant result = vectorOfHolidays->at(index.row()).toMap();
+		gregorian_calendar::ymd_type ymd = gregorian_calendar::from_day_number(result.toMap()["begin"].toInt());
+		return QVariant(QString("%1.%2.%3").arg(ymd.day).arg(ymd.month).arg(ymd.year));
 	}
 	return QVariant();
 }
 
 int HolidayListModel::rowCount(const QModelIndex& index) const
 {
-	return index.isValid() ? 0 : content.size();
+	const int& key = indexRow;
+	return index.isValid() ? 0 : std::get<2>(content.at(key))->size();
 }
 
 int HolidayListModel::columnCount(const QModelIndex& index) const
@@ -109,3 +113,18 @@ void HolidayListModel::clearContent()
 {
 	content.clear();
 }
+
+void HolidayListModel::printContent()
+{
+	for (auto it : content){
+		std::cout << "Row:" << std::get<0>(it) << ", id = " << std::get<0>(std::get<1>(it)) << std::endl;
+		int numrow = 0;
+		for (auto it_holiday : *(std::get<2>(std::get<1>(it)))){
+			std::cout << "Holiday from: " << it_holiday.beginDate() << std::endl;
+			QModelIndex index = createIndex(numrow, 0);
+			std::cout << "Data from model: " << data(index, Qt::DisplayRole).toString().toStdString() << std::endl;
+			++numrow;
+		}
+	}
+}
+

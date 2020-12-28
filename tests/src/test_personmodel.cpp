@@ -7,8 +7,10 @@
 clParametrs appParametrs; // Параметры приложения - глобальная переменная
 int main(int argc, char **argv)
 {
+	appParametrs.setArgs(argc, argv);
+	appParametrs.loadFromFile();
 	QApplication app(argc, argv);
-	DialogEditTxtFile *mainDialog = new DialogEditTxtFile();
+	DialogEditTxtFile *mainDialog = new DialogEditTxtFile(DialogEditTxtFile::TXT);
 	mainDialog->show();
 	return app.exec();
 }

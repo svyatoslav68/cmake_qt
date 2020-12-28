@@ -42,14 +42,15 @@ private:
 	//HolidayTableModel(){};
 	static const int COLUMN_COUNT = 3;
 	std::set<int> varCodPerson;
+	std::vector<std::pair<std::vector<int>, int>> conditions;
+	void outChangedData();
+protected:
 	std::map<int, // Number row in table
 			std::tuple<int, // cod_person
 			std::string, // FIO
 			std::vector<THoliday>*, //pointer on vector holidays
 			std::set<boost::gregorian::date>* // Dates of conflicts
 				>> content;
-	std::vector<std::pair<std::vector<int>, int>> conditions;
-	void outChangedData();
 };
 
   

@@ -25,7 +25,7 @@ int main() {
 	boost_sets.push_back(set_dates2);
 	boost_sets.push_back(set_dates3);
 	std::set<boostdate> result_set;
-	result_set = more_intersection(boost_sets);
+	result_set = my_functions::more_intersection(boost_sets);
 	//std::insert_iterator<std::set<boostdate>> insit = result_set.begin();
 	//std::set_intersection(set_dates1.begin(),set_dates1.end(), set_dates2.begin(), set_dates2.end(), std::inserter(result_set, result_set.begin()));
 	result_set.insert(boostdate(2020,Jun,10)); 
@@ -37,6 +37,6 @@ int main() {
 	std::vector<boost::gregorian::date_period> vector_periods;
 	//vector_sets.push_back(result_set);
 	vector_periods.push_back(dp);
-	vector_periods = setToPeriods(result_set);
+	vector_periods = my_functions::setToPeriods(result_set);
 }
 

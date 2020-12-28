@@ -2,6 +2,7 @@
 #ifndef FUNCTIONS_HPP
 #define FUNCTIONS_HPP
 
+namespace my_functions {
 template <typename T>
 inline std::set<T> more_intersection(std::vector<std::set<T> > vector_sets){
 	std::set<T> result;
@@ -18,5 +19,6 @@ inline std::set<T> more_intersection(std::vector<std::set<T> > vector_sets){
 }
 
 std::vector<boost::gregorian::date_period> setToPeriods(std::set<boost::gregorian::date>);
+}
 
 #endif //
