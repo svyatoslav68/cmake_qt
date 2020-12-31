@@ -45,6 +45,7 @@ HolidayListModel::HolidayListModel(int row, int cod_person,  MODE mode):HolidayT
 		}
 	}
 	else if (mode == TXT) {
+		std::cout << "Mode of HolidayTableModel = TXT\n";
 		//ValuesFromXML PersonsFile("holidays.xml");			
 	}
 	else {
@@ -73,9 +74,11 @@ QVariant HolidayListModel::data(const QModelIndex &index, int role) const
 	if (role == Qt::DisplayRole){
 		using namespace boost::gregorian;
 		std::vector<THoliday> *vectorOfHolidays = std::get<2>(content.at(key));
-		QVariant result = vectorOfHolidays->at(index.row()).toMap();
-		gregorian_calendar::ymd_type ymd = gregorian_calendar::from_day_number(result.toMap()["begin"].toInt());
-		return QVariant(QString("%1.%2.%3").arg(ymd.day).arg(ymd.month).arg(ymd.year));
+		if (vectorOfHolidays) {
+			QVariant result = vectorOfHolidays->at(index.row()).toMap();
+			gregorian_calendar::ymd_type ymd = gregorian_calendar::from_day_number(result.toMap()["begin"].toInt());
+			return QVariant(QString("%1.%2.%3").arg(ymd.day).arg(ymd.month).arg(ymd.year));
+		}
 	}
 	return QVariant();
 }

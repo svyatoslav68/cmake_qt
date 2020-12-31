@@ -7,6 +7,9 @@
 #define DIALOG_HOLIDAY_HPP
 
 #include <QDialog>
+class QDateEdit;
+class QLineEdit;
+class QPushButton;
 
 class DialogHoliday : public QDialog
 {
@@ -14,6 +17,11 @@ class DialogHoliday : public QDialog
 public:
 	DialogHoliday(QWidget *parent = nullptr);
 	~DialogHoliday();
+private:
+	QPushButton *buOk, *buCancel;
+	QDateEdit *deBeginHoliday;
+	QLineEdit *leDurationHoliday;
+	QLineEdit *leTravelDays;
 };
 
 #endif // DIALOG_HOLIDAY_HPP
