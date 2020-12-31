@@ -20,7 +20,7 @@ DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):source(source
 {
 	viewPersons = new QListView();
 	if (source == TXT){
-		setWindowTitle(QString("Содержимое файла: %1").arg(name_file.c_str()));
+		setWindowTitle(QString("Содержимое файла: %1").arg(m_name_file.c_str()));
 		personModel = new PersonListModel(PersonModel::TXT, this);
 		viewPersons->setModel(personModel);
 		connect(viewPersons, &QListView::clicked, this, [this](const QModelIndex &index){this->changeIndexPerson(viewPersons->currentIndex());});
@@ -66,6 +66,7 @@ DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):source(source
 	viewHolidays = new QListView();
 	buAddHoliday = new QPushButton("+");
 	buDeleteHoliday = new QPushButton("-");
+	connect(buDeleteHoliday, &QPushButton::clicked, this, [this](){this->deleteHoliday();});
 	buEditHoliday = new QPushButton("...");
 	QHBoxLayout *holidaysButtonsLayout = new QHBoxLayout;
 	holidaysButtonsLayout->addWidget(buAddHoliday);
@@ -114,23 +115,23 @@ std::string DialogEditTxtFile::selectFile()
 	}
 	personModel = new PersonListModel(PersonModel::TXT, this);
 	viewPersons->setModel(personModel);
-	name_file = QFileDialog::getOpenFileName(this, "Выбор файла", "", "XML (*.xml)").toStdString();
-	PersonsFile file(name_file.c_str());
-	setWindowTitle(QString("Содержимое файла: %1").arg(name_file.c_str()));
+	m_name_file = QFileDialog::getOpenFileName(this, "Выбор файла", "", "XML (*.xml)").toStdString();
+	PersonsFile file(m_name_file.c_str());
+	setWindowTitle(QString("Содержимое файла: %1").arg(m_name_file.c_str()));
 	std::vector<PersonsFile::employee> v = file.getPersons();
 	for (auto p : v ){
 		//std::cout << "Employee: " << p.id_employee << ":" << p.family << std::endl;
 		personModel->addPerson(p.id_employee, p.position, p.family);
 	}
-	return name_file;
+	return m_name_file;
 }
 
 void DialogEditTxtFile::saveFile()
 {
 	bool openFile = false;
-	PersonsFile file(name_file.c_str());
+	PersonsFile file(m_name_file.c_str());
 	file.savePersons(personModel->getContent());
-	std::cout << "В файл: " << name_file << "\n";
+	std::cout << "В файл: " << m_name_file << "\n";
 	std::cout << "Мы пытались сохранить следующее:\n";
 	for (auto [id, position, fio] : personModel->getContent()){
 		const char * str_position = position.size()?std::string(" "+position).c_str():""; 
@@ -148,7 +149,10 @@ void DialogEditTxtFile::addHoliday(){
 }
 
 void DialogEditTxtFile::deleteHoliday(){
-
+	if (holidaysModel){
+		QModelIndex indexHoliday = viewHolidays->currentIndex();
+		holidaysModel->removeRows(indexHoliday.row(), 1);
+	}
 }
 
 void DialogEditTxtFile::slotLoadBD()

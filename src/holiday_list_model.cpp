@@ -101,6 +101,17 @@ QModelIndex HolidayListModel::parent ( const QModelIndex & ) const
 	return QModelIndex();
 }
 
+bool HolidayListModel::removeRows(int row, int count, const QModelIndex & parent)
+{
+	beginRemoveRows(parent, row, row+count - 1);
+	auto it = std::get<2>(content.at(indexRow))->cbegin();
+	for (int i = row; i < row+count; ++i){
+		std::get<2>(content.at(indexRow))->erase(it+i);
+	}
+	endRemoveRows();
+	return true;
+}
+
 void HolidayListModel::loadFromTxt()
 {
 }

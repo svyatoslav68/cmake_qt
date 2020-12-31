@@ -27,6 +27,7 @@ public:
 	int columnCount(const QModelIndex&) const;
 	QModelIndex index ( int row, int column, const QModelIndex &) const;
 	QModelIndex parent ( const QModelIndex & ) const;
+	bool removeRows(int row, int count = 1, const QModelIndex &parent = QModelIndex());
 	/***********************************************************************/
 	void printContent();
 public slots:

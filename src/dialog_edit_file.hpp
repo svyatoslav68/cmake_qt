@@ -42,7 +42,7 @@ private:
 	QPushButton *buAddHoliday, *buDeleteHoliday, *buEditHoliday;
 	PersonModel *personModel;
 	HolidayListModel *holidaysModel;
-	std::string name_file;	
+	std::string m_name_file;	
 };
 
 #endif //DIALOG_EDIT_FILE_HPP

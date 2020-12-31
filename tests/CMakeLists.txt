@@ -9,6 +9,13 @@ set(SOURCE_DIR src)
 set(SOURCE_APP ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 # set(SOURCE_APP ../src)
 
+if (APPLE)
+	message("Сборка запущена на ${CMAKE_SYSTEM_NAME}")
+	message("Устанавливается расположение библиотеки Qt для MacOS")
+	set(CMAKE_PREFIX_PATH /opt/local/libexec/qt5)
+	set(CMAKE_PREFIX_PATH /usr/local/Cellar/qt/5.15.1)
+endif()
+
 set(HEADER_DIR $ENV{HOME}/mylib/include)
 set(LIB_DIR $ENV{HOME}/mylib/lib)
 

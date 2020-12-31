@@ -115,7 +115,7 @@ QModelIndex PersonModel::parent ( const QModelIndex & ) const{
 
 bool PersonModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-	beginRemoveRows(QModelIndex(), row, row+count - 1);
+	beginRemoveRows(parent, row, row+count - 1);
 	auto it = content.cbegin();
 	for (int i = row; i < row+count; ++i){
 		content.erase(it+i);
