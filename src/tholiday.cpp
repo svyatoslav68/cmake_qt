@@ -58,7 +58,7 @@ void THoliday::displayHoliday() const {
 using namespace boost::gregorian;
 	date_facet *facet(new date_facet("%d.%m.%Y"));
 	std::cout.imbue(std::locale(std::cout.getloc(), facet));
-	std::cout << std::setw(40) << std::setfill(' ') << std::left << name_holiday << std::setw(13) << m_date_begin << std::setw(3) << std::right << holiday_duration << std::endl;
+	std::cout << std::setw(20) << std::setfill(' ') << std::left << name_holiday << std::setw(13) << m_date_begin << std::setw(6) << std::right << holiday_duration << std::setw(5) << std::right << travel_duration << std::endl;
 }
 
 THoliday& THoliday::operator+=(const int numdays){

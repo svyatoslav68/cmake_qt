@@ -45,7 +45,9 @@ HolidayListModel::HolidayListModel(int row, int cod_person,  MODE mode):HolidayT
 		}
 	}
 	else if (mode == TXT) {
-		std::cout << "Mode of HolidayTableModel = TXT\n";
+		std::cout << "Mode of HolidayListModel = TXT\n";
+		std::vector<THoliday> *vectorOfHolidays = new std::vector<THoliday>();
+		content[row] = std::make_tuple(cod_person, std::string(""), vectorOfHolidays, nullptr);
 		//ValuesFromXML PersonsFile("holidays.xml");			
 	}
 	else {
@@ -140,5 +142,12 @@ void HolidayListModel::printContent()
 			++numrow;
 		}
 	}
+}
+
+void HolidayListModel::addHoliday(const THoliday holiday)
+{
+	std::vector<THoliday> *holidays = std::get<2>(content[indexRow]);
+	holidays->push_back(holiday);
+	emit dataChanged(createIndex(0, 0), createIndex(std::get<2>(content[indexRow])->size() - 1, 0));
 }
 

@@ -1,119 +1,141 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <FILE>
-    <SQL>
-        <TPerson>
-            <description>Объект содержащих данные о сотруднике</description>
-            <getDataPerson>
-                <description>Запрос для получения данных о сотруднике</description>
-                <query>SELECT idPerson, family, name, parent, person_no, sex, birthday, placeborn, payposition, kodunit, field_duty, dopusk, inn, file_image, GET_CURRENT_ACTION(idPerson, 1, 0) as rank_person, GET_CURRENT_ACTION(idPerson, 2, 0) as position_person, GET_CURRENT_ACTION(idPerson, 3, 0) as class_person, GET_FULL_NAME_UNIT_LEVEL(kodunit, -1, &apos;i&apos;) as name_unit FROM main WHERE idPerson = %d</query>
-            </getDataPerson>
-        </TPerson>
-        <ListPerson>
-            <description>Список сотрудников</description>
-            <getListPersonsUnit>
-                <description>Список сотрудников подразделения с идентификтором kodunit</description>
-                <query>SELECT idPerson, family, name, parent FROM main WHERE kodunit=%d</query>
-            </getListPersonsUnit>
-            <getMilitaryPersonsUnit>
-                <description>Список военнослужащих подразделения</description>
-                <query>SELECT m.idPerson, GET_CURRENT_ACTION(idPerson, 2, 0) as position_person, CONCAT(m.family, &quot; &quot;, LEFT(m.name,1), &quot;. &quot;, LEFT(m.parent,1), &quot;.&quot;) AS &quot;FIO&quot;, m.family, m.name, m.parent FROM main m WHERE m.kodunit=%d AND IS_MILITARY(m.idPerson)</query>
-            </getMilitaryPersonsUnit>
-            <getListPersons>
-                <description>Список сотрудников</description>
-                <query>SELECT idPerson, family, name, parent FROM main</query>
-            </getListPersons>
-        </ListPerson>
-        <ListUnits>
-            <description>Класс списка подразделений</description>
-            <TUnit>
-                <description>Запрос возвращает полное название подарзделения</description>
-                <query>SELECT GET_FULL_NAME_UNIT_LEVEL(%d, 2, &apos;i&apos;), GET_FULL_NAME_UNIT_LEVEL(%d, -1, &apos;i&apos;)</query>
-            </TUnit>
-        </ListUnits>
-        <TypesHoliday>
-            <loadTypes>
-                <description>Запрос возвращает типы отпусков</description>
-                <query>SELECT id_type_otpusk, name_type, name_type_r FROM types_otpusk</query>
-            </loadTypes>
-        </TypesHoliday>
-        <ListHolidays>
-            <loadHolidays>
-                <description>Запрос возвращает планируемые отпуска для сотрудника с идентификатором cod_person в выбранном году</description>
-                <query>SELECT p.id_otpusk as id, p.plan_begin date, p.plan_size+p.plan_time_travel as size, t.name_type as type FROM plan_otpusk p, types_otpusk t WHERE t.id_type_otpusk=p.cod_type AND YEAR(plan_begin)=%d AND cod_person=%d ORDER BY plan_begin;</query>
-            </loadHolidays>
-        </ListHolidays>
-        <THoliday>
-            <getPersonHolidays>
-                <description>Запрос возвращает планируемые отпуска для сотрудника с идентификатором cod_person в выбранном году</description>
-                <query>SELECT p.id_otpusk as id, t.name_type as name_type, p.plan_begin as date_begin, p.plan_size as size, p.plan_time_travel as duration FROM plan_otpusk p, types_otpusk t WHERE year(p.plan_begin) = %d and t.id_type_otpusk=p.cod_type AND p.cod_person=%d ORDER BY p.plan_begin;</query>
-            </getPersonHolidays>
-            <getHoliday>
-                <description>Запрос возвращает планируемый отпуск по коду отпуска</description>
-                <query>SELECT p.id_otpusk as id, t.name_type as name_type, p.cod_person as person, p.plan_begin as date_begin, p.plan_size as size, p.plan_time_travel as duration FROM plan_otpusk p, types_otpusk t WHERE t.id_type_otpusk=p.cod_type AND p.id_otpusk=%d;</query>
-            </getHoliday>
-            <updateHoliday>
-                <description>Шаблон запроса для обновления данных планируемого отпуска</description>
-                <query>UPDATE plan_otpusk SET plan_begin = &apos;%s&apos;, plan_size = %d, plan_time_travel = %d WHERE id_otpusk = %d;</query>
-            </updateHoliday>
-        </THoliday>
-        <HolidayTableModel>
-            <getAllHolidays>
-                <description>Запрос возвращает все отпуска планируемые в заданном году</description>
-                <query>SELECT p.cod_person as cod_person, m.family as FIO, t.name_type as type, p.plan_begin as begib, p.plan_size as duration FROM plan_otpusk p, types_otpusk t, main m WHERE m.idPerson = p.cod_person AND t.id_type_otpusk = p.cod_type AND YEAR(plan_begin)=2020 ORDER BY p.cod_person, p.plan_begin;</query>
-            </getAllHolidays>
-        </HolidayTableModel>
-        <TUnits>
-            <getNameUnits>
-                <description>Запрос возвращает список всех организаций и подразделений, отсортированных по уровню, для постоения дерева</description>
-                <query>SELECT `idUnit` as `id`, IF(`view_type`=&apos;none&apos;, `name`, CONVERT(IF(`view_type`=&apos;before&apos;,CONCAT_WS(&apos; &apos;,type, IFNULL(IF(`name`=&apos;&apos;,`number`,`name`), `number`)), CONCAT_WS(&apos; &apos;, IFNULL(IF(`name`=&apos;&apos;,`number`,`name`), `number`),`type`)) using utf8)) AS `display name`, GET_FULL_NAME_UNIT(idUnit) as `full name`, level, parent, number, type, view_type FROM list_staff ORDER BY level, number;</query>
-            </getNameUnits>
-            <getPropertyUnit>
-                <description>Запрос возвращает свойства подразделения по его идентификатору</description>
-                <query>SELECT `idUnit` as `id`, IF(`view_type`=&apos;none&apos;, `name`, CONVERT(IF(`view_type`=&apos;before&apos;,CONCAT_WS(&apos; &apos;,type, IFNULL(IF(`name`=&apos;&apos;,`number`,`name`), `number`)), CONCAT_WS(&apos; &apos;, IFNULL(IF(`name`=&apos;&apos;,`number`,`name`), `number`),`type`)) using utf8)) AS `display name`, GET_FULL_NAME_UNIT(idUnit) as `full name`, level, parent FROM list_staff WHERE idUnit = %d;</query>
-            </getPropertyUnit>
-        </TUnits>
-    </SQL>
-    <SettingsApplication>
-        <description>Настройки приложения</description>
-        <unit>40</unit>
-        <year>2020</year>
-    </SettingsApplication>
-    <Groups>
-        <Keys>
-            <member>147</member>
-            <member>148</member>
-            <condition>great 1</condition>
-        </Keys>
-        <Smena>
-            <member>25</member>
-            <member>147</member>
-            <member>148</member>
-            <member>151</member>
-            <member>152</member>
-            <member>153</member>
-            <member>157</member>
-            <member>159</member>
-            <member>161</member>
-            <member>172</member>
-            <member>220</member>
-            <member>230</member>
-            <member>233</member>
-            <member>244</member>
-            <member>253</member>
-            <member>2</member>
-            <member>10</member>
-            <member>156</member>
-            <condition>great 3</condition>
-        </Smena>
-        <Head>
-            <member>2</member>
-            <member>10</member>
-            <condition>great 1</condition>
-        </Head>
-        <Material>
-            <member>253</member>
-            <member>159</member>
-            <condition>great 1</condition>
-        </Material>
-    </Groups>
+<SQL>
+<TPerson>
+	<description>
+		Объект содержащих данные о сотруднике
+	</description>
+	<getDataPerson>
+		<description>
+			Запрос для получения данных о сотруднике
+		</description>
+		<query>
+			SELECT idPerson, family, name, parent, person_no, sex, birthday, placeborn, payposition, kodunit, field_duty, dopusk, inn, file_image, GET_CURRENT_ACTION(idPerson, 1, 0) as rank_person, GET_CURRENT_ACTION(idPerson, 2, 0) as position_person, GET_CURRENT_ACTION(idPerson, 3, 0) as class_person, GET_FULL_NAME_UNIT_LEVEL(kodunit, -1, 'i') as name_unit FROM main WHERE idPerson = %d
+		</query>
+	</getDataPerson>
+</TPerson>
+<ListPerson>
+	<description>
+		Список сотрудников
+	</description>
+	<getListPersonsUnit>
+		<description>
+			Список сотрудников подразделения с идентификтором kodunit
+		</description>
+		<query>
+			SELECT idPerson, family, name, parent FROM main WHERE kodunit=%d
+		</query>
+	</getListPersonsUnit>
+	<getMilitaryPersonsUnit>
+		<description>
+			Список военнослужащих подразделения 
+		</description>
+		<query>
+			SELECT m.idPerson, GET_CURRENT_ACTION(idPerson, 2, 0) as position_person, CONCAT(m.family, " ", LEFT(m.name,1), ". ", LEFT(m.parent,1), ".") AS "FIO", m.family, m.name, m.parent FROM main m WHERE m.kodunit=%d AND IS_MILITARY(m.idPerson)
+		</query>
+	</getMilitaryPersonsUnit>
+	<getListPersons>
+		<description>
+			Список сотрудников 
+		</description>
+		<query>
+			SELECT idPerson, family, name, parent FROM main
+		</query>
+	</getListPersons>
+</ListPerson>
+<ListUnits>
+	<description>
+		Класс списка подразделений
+	</description>
+	<TUnit>
+		<description>
+			Запрос возвращает полное название подарзделения
+		</description>
+		<query>
+			SELECT GET_FULL_NAME_UNIT_LEVEL(%d, 2, 'i'), GET_FULL_NAME_UNIT_LEVEL(%d, -1, 'i')
+		</query>
+	</TUnit>
+</ListUnits>
+<TypesHoliday>
+	<loadTypes>
+		<description>
+			Запрос возвращает типы отпусков
+		</description>
+		<query>
+			SELECT id_type_otpusk, name_type, name_type_r FROM types_otpusk
+		</query>
+	</loadTypes>
+</TypesHoliday>
+<ListHolidays>
+	<loadHolidays>
+		<description>
+			Запрос возвращает планируемые отпуска для сотрудника с идентификатором cod_person в выбранном году
+		</description>
+		<query>
+			SELECT p.id_otpusk as id, p.plan_begin date, p.plan_size+p.plan_time_travel as size, t.name_type as type FROM plan_otpusk p, types_otpusk t WHERE t.id_type_otpusk=p.cod_type AND YEAR(plan_begin)=%d AND cod_person=%d ORDER BY plan_begin;
+		</query>
+	</loadHolidays>
+</ListHolidays>
+<THoliday>
+	<getPersonHolidays>
+		<description>
+			Запрос возвращает планируемые отпуска для сотрудника с идентификатором cod_person в выбранном году
+		</description>
+		<query>
+			SELECT p.id_otpusk as id, t.name_type as name_type, p.plan_begin as date_begin, p.plan_size as size, p.plan_time_travel as duration FROM plan_otpusk p, types_otpusk t WHERE year(p.plan_begin) = %d and t.id_type_otpusk=p.cod_type AND p.cod_person=%d ORDER BY p.plan_begin; 
+		</query>
+	</getPersonHolidays>
+	<getHoliday>
+		<description>
+			Запрос возвращает планируемый отпуск по коду отпуска
+		</description>
+		<query>
+			SELECT p.id_otpusk as id, t.name_type as name_type, p.cod_person as person, p.plan_begin as date_begin, p.plan_size as size, p.plan_time_travel as duration FROM plan_otpusk p, types_otpusk t WHERE t.id_type_otpusk=p.cod_type AND p.id_otpusk=%d; 
+		</query>
+	</getHoliday>
+</THoliday>
+<HolidayTableModel>
+	<getAllHolidays>
+		<description>
+			Запрос возвращает все отпуска планируемые в заданном году
+		</description>
+		<query>
+			SELECT p.cod_person as cod_person, m.family as FIO, t.name_type as type, p.plan_begin as begib, p.plan_size as duration FROM plan_otpusk p, types_otpusk t, main m WHERE m.idPerson = p.cod_person AND t.id_type_otpusk = p.cod_type AND YEAR(plan_begin)=2020 ORDER BY p.cod_person, p.plan_begin;
+		</query>
+	</getAllHolidays>
+</HolidayTableModel>
+<TUnits>
+	<getNameUnits>
+		<description>
+			Запрос возвращает список всех организаций и подразделений, отсортированных по уровню, для постоения дерева
+		</description>
+		<query>
+			SELECT `idUnit` as `id`, IF(`view_type`='none', `name`, CONVERT(IF(`view_type`='before',CONCAT_WS(' ',type, IFNULL(IF(`name`='',`number`,`name`), `number`)), CONCAT_WS(' ', IFNULL(IF(`name`='',`number`,`name`), `number`),`type`)) using utf8)) AS `display name`, GET_FULL_NAME_UNIT(idUnit) as `full name`, level, parent, number, type, view_type FROM list_staff ORDER BY level, number;
+		</query>
+	</getNameUnits>
+	<getPropertyUnit>
+		<description>
+			Запрос возвращает свойства подразделения по его идентификатору
+		</description>
+		<query>
+			SELECT `idUnit` as `id`, IF(`view_type`='none', `name`, CONVERT(IF(`view_type`='before',CONCAT_WS(' ',type, IFNULL(IF(`name`='',`number`,`name`), `number`)), CONCAT_WS(' ', IFNULL(IF(`name`='',`number`,`name`), `number`),`type`)) using utf8)) AS `display name`, GET_FULL_NAME_UNIT(idUnit) as `full name`, level, parent FROM list_staff WHERE idUnit = %d;
+		</query>
+	</getPropertyUnit>
+</TUnits>
+</SQL>
+<SettingsApplication>
+	<description>
+		Настройки приложения
+	</description>
+	<unit>40
+	</unit>
+	<year>2020
+	</year>
+</SettingsApplication>
+<Groups>
+	<AAA>
+	<member>10</member>
+	</AAA>
+	<bbb></bbb>
+</Groups>
 </FILE>

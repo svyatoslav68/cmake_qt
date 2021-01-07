@@ -4,11 +4,16 @@
  *********************************************************************/
 #include <string>
 #include <QLineEdit>
+#include <QValidator>
 #include <QDateEdit>
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QLabel>
+#include <boost/date_time/gregorian/gregorian.hpp>
 #include "dialog_holiday.hpp"
+
+using bd=boost::gregorian::date;
+using bdd=boost::gregorian::date_duration;
 
 DialogHoliday::DialogHoliday(QWidget *parent)
 {
@@ -18,10 +23,14 @@ DialogHoliday::DialogHoliday(QWidget *parent)
 	buCancel = new QPushButton("Отмена", this);
 	QLabel *laBeginHoliday = new QLabel("Дата начала отпуска:");
 	deBeginHoliday = new QDateEdit(this);
+	QValidator *durationValidator = new QIntValidator(1, 366, this);
 	QLabel *laDuration = new QLabel("Продолжительность (сут.):");
 	leDurationHoliday = new QLineEdit(this);
+	leDurationHoliday->setValidator(durationValidator);
 	QLabel *laTravelDays = new QLabel("Дорога (сут.):");
+	QValidator *travelValidator = new QIntValidator(2, 100, this);
 	leTravelDays = new QLineEdit(this);
+	leTravelDays->setValidator(travelValidator);
 	QVBoxLayout *beginDateLayout = new QVBoxLayout;
 	beginDateLayout->addWidget(laBeginHoliday);
 	beginDateLayout->addWidget(deBeginHoliday);
@@ -48,5 +57,21 @@ DialogHoliday::DialogHoliday(QWidget *parent)
 DialogHoliday::~DialogHoliday() 
 {
 
+}
+
+bd DialogHoliday::getBeginDate()
+{
+	bd d(boost::gregorian::from_string(deBeginHoliday->date().toString("yyyy-MM-dd").toStdString()));
+	return d;
+}
+
+bdd DialogHoliday::getDuration()
+{
+	return bdd(leDurationHoliday->text().toInt());
+}
+
+bdd DialogHoliday::getTravelDay()
+{
+		return bdd(leTravelDays->text().toInt());
 }
 

@@ -65,6 +65,7 @@ target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/holiday_table_model.cpp)
 target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/holiday_list_model.cpp)
 target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/person_model.cpp)
 target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/tholiday.cpp)
+target_sources(${TARGET_DIALOG} PUBLIC ${SOURCE_APP}/dialog_holiday.cpp)
 
 find_package(Boost REQUIRED COMPONENTS program_options date_time)
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui) 

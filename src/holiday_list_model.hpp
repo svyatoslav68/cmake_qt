@@ -31,6 +31,7 @@ public:
 	/***********************************************************************/
 	void printContent();
 public slots:
+	void addHoliday(const THoliday holiday);
 	void loadFromTxt();
 	void loadFromBd();
 private:
