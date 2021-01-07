@@ -32,7 +32,7 @@ private slots:
 	void showDialogHoliday();
 	void changeIndexPerson(const QModelIndex &);
 private:
-	MODE source;
+	MODE m_source;
 	QListView *viewPersons;
 	QListView *viewHolidays;
 	QLineEdit *edNewPerson;

@@ -1,5 +1,6 @@
 # Directory C++ temporary files
 .build
+tests/.build
 
 .DS_Store
 .git
