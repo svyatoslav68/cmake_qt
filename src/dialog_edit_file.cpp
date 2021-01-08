@@ -21,16 +21,20 @@
 DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):m_source(source),personModel(nullptr),holidaysModel(nullptr)
 {
 	viewPersons = new QListView();
+	viewHolidays = new QListView();
 	if (m_source == TXT){
 		setWindowTitle(QString("Содержимое файла: %1").arg(m_name_file.c_str()));
 		personModel = new PersonListModel(PersonModel::TXT, this);
-		viewPersons->setModel(personModel);
 		connect(viewPersons, &QListView::clicked, this, [this](const QModelIndex &index){this->changeIndexPerson(viewPersons->currentIndex());});
+		holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::TXT);
 	}
 	else if (m_source == SQL) {
 		setWindowTitle(QString("Содержимое БД"));
 		personModel = new PersonListModel(PersonModel::SQL, this);
+		holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::SQL);
 	}
+	viewPersons->setModel(personModel);
+	viewHolidays->setModel(holidaysModel);
 	buSelectFile = new QPushButton("Загрузить из файла");
 	buSelectFile->setObjectName("buSelectFile");
 	connect(buSelectFile, &QPushButton::clicked, this, [this](){this->selectFile();});
@@ -65,7 +69,6 @@ DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):m_source(sour
 	personLayout->addWidget(edNewPerson);
 	personLayout->addLayout(personControlLayout);
 	QVBoxLayout *holidaysLayout = new QVBoxLayout;
-	viewHolidays = new QListView();
 	buAddHoliday = new QPushButton("+");
 	connect(buAddHoliday, &QPushButton::clicked, this, [this](){this->addHoliday();});
 	buDeleteHoliday = new QPushButton("-");
@@ -85,12 +88,6 @@ DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):m_source(sour
 	QHBoxLayout *topLayout = new QHBoxLayout;
 	topLayout->addLayout(personLayout);
 	topLayout->addLayout(holidaysLayout);
-	/*QHBoxLayout *selectLayout = new QHBoxLayout;
-	selectLayout->addStretch();
-	selectLayout->addWidget(buSelectFile);
-	selectLayout->addStretch();
-	//mainLayout->addLayout(topLayout, 1);
-	mainLayout->addLayout(selectLayout);*/
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->addLayout(topLayout);
 	mainLayout->addLayout(bottomLayout);
@@ -120,7 +117,10 @@ std::string DialogEditTxtFile::selectFile()
 	if (personModel){
 		delete personModel;
 	}
-	personModel = new PersonListModel(PersonModel::TXT, this);
+	if (holidaysModel) {
+		delete holidaysModel;
+	}
+	personModel = new PersonListModel(PersonListModel::TXT, this);
 	viewPersons->setModel(personModel);
 	m_name_file = QFileDialog::getOpenFileName(this, "Выбор файла", "", "XML (*.xml)").toStdString();
 	PersonsFile file(m_name_file.c_str());
@@ -130,6 +130,8 @@ std::string DialogEditTxtFile::selectFile()
 		//std::cout << "Employee: " << p.id_employee << ":" << p.family << std::endl;
 		personModel->addPerson(p.id_employee, p.position, p.family);
 	}
+	holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::TXT);
+	viewHolidays->setModel(holidaysModel);
 	return m_name_file;
 }
 
@@ -157,6 +159,8 @@ void DialogEditTxtFile::addHoliday(){
 		THoliday newHoliday(dialogHoliday->getBeginDate(), dialogHoliday->getDuration(), dialogHoliday->getTravelDay());		
 		newHoliday.displayHoliday();
 		if (holidaysModel && viewPersons->currentIndex().isValid()) {
+			holidaysModel->setPosition(viewPersons->currentIndex().row(), personModel->PersonModel::data(viewPersons->currentIndex(), Qt::DisplayRole).toInt());
+			std::cout << "holidaysModel.m_indexRow = " << holidaysModel->getIndexRow() << std::endl;
 			holidaysModel->addHoliday(newHoliday);
 		}
 	}
@@ -179,6 +183,11 @@ void DialogEditTxtFile::slotLoadBD()
 	}
 	personModel = new PersonListModel(PersonModel::SQL, this);
 	viewPersons->setModel(personModel);
+	if (holidaysModel) {
+		delete holidaysModel;
+	}
+	holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::SQL);
+	viewHolidays->setModel(holidaysModel);
 }
 
 void DialogEditTxtFile::changeIndexPerson(const QModelIndex &index)
@@ -192,11 +201,10 @@ void DialogEditTxtFile::changeIndexPerson(const QModelIndex &index)
 	buAddHoliday->setEnabled(true);
 	buEditHoliday->setEnabled(true);
 	buDeleteHoliday->setEnabled(true);
-	if (holidaysModel)
-		delete holidaysModel;
+	holidaysModel->setPosition(index.row(), personModel->PersonModel::data(index, Qt::DisplayRole).toInt());
 	//QModelIndex modifyIndex = index.siblingAtColumn(PersonModel::ID);
-	std::cout << "row = " << index.row() << ", column = " << index.column() << ", id = " << personModel->PersonModel::data(index, Qt::DisplayRole).toInt() << std::endl;
-	holidaysModel = new HolidayListModel(index.row(), personModel->PersonModel::data(index, Qt::DisplayRole).toInt(), (m_source == SQL)?HolidayListModel::SQL:HolidayListModel::TXT);
-	viewHolidays->setModel(holidaysModel);
+	//std::cout << "row = " << index.row() << ", column = " << index.column() << ", id = " << personModel->PersonModel::data(index, Qt::DisplayRole).toInt() << std::endl;
+	//holidaysModel = new HolidayListModel(index.row(), personModel->PersonModel::data(index, Qt::DisplayRole).toInt(), (m_source == SQL)?HolidayListModel::SQL:HolidayListModel::TXT);
+	//viewHolidays->setModel(holidaysModel);
 	//holidaysModel->printContent();
 }

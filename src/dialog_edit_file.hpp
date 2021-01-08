@@ -9,7 +9,7 @@
 #include <QDialog>
 class QListView;
 class QLineEdit;
-class PersonModel;
+class PersonListModel;
 class QPushButton;
 class HolidayListModel;
 
@@ -40,7 +40,7 @@ private:
 	QPushButton *buSelectFile;
 	QPushButton *buOk, *buCancel, *buSave, *buAddPerson, *buDeletePerson, *buEditPerson;
 	QPushButton *buAddHoliday, *buDeleteHoliday, *buEditHoliday;
-	PersonModel *personModel;
+	PersonListModel *personModel;
 	HolidayListModel *holidaysModel;
 	std::string m_name_file;	
 };

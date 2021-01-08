@@ -36,3 +36,17 @@ QVariant PersonListModel::headerData(int section, Qt::Orientation orientation, i
 	}
 	return QVariant();
 }
+
+std::vector<std::pair<int, int>> PersonListModel::pairOfPersons() const
+{
+	std::cout << "execute PersonListModel::pairOfPersons()\n";
+	std::cout << "size of content =" << content.size() << std::endl;
+	std::vector<std::pair<int, int>> result;
+	int number_row = 0;
+	for (auto person : content){
+		std::cout << std::get<2>(person) << "; row = "<< number_row << std::endl;
+		result.push_back(std::make_pair(number_row++ , std::get<0>(person)));
+	}
+	return result;
+}
+

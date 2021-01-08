@@ -17,38 +17,43 @@ extern clParametrs appParametrs;
 
 //std::map<int, std::tuple<int, std::vector<THoliday>>> HolidayListModel::content;
 
-HolidayListModel::HolidayListModel(int row, int cod_person,  MODE mode):HolidayTableModel(), indexRow(row)
+HolidayListModel::HolidayListModel(std::vector<std::pair<int, int>> persons, MODE mode):HolidayTableModel(), m_mode(mode), m_indexRow(-1)
 {
+	std::cout << "Constructor of HolidayListModel\n";
 	if (mode == SQL) {
+		std::cout << "Mode of HolidayListModel = SQL\n";
 		std::string template_SQL_for_Fill = ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "THoliday", "getPersonHolidays");
 		MYSQL_RES *data_from_BD = nullptr;
 		std::stringstream ss;
-		ss << boost::format(template_SQL_for_Fill)%appParametrs.getYear()%cod_person << std::flush;
-		std::string SQL = ss.str(); // Запрос для заполнения content
-		std::cout << "SQL = " << SQL << std::endl;
-		int mysql_status = 0;
-		mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
-		if (mysql_status){
-			std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
-		}
-		else {
-			data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
-			MYSQL_ROW row_holiday;
-			std::vector<THoliday> *vectorOfHolidays = new std::vector<THoliday>();
-			row_holiday = mysql_fetch_row(data_from_BD);
-			while (row_holiday){ 
-				THoliday newHoliday(boost::lexical_cast<int>(row_holiday[0]), row_holiday[2], boost::lexical_cast<int>(row_holiday[3]), boost::lexical_cast<int>(row_holiday[4]), row_holiday[1]);
-				vectorOfHolidays->push_back(newHoliday);
-				row_holiday = mysql_fetch_row(data_from_BD);
+		for (auto personPair : persons){
+			ss << boost::format(template_SQL_for_Fill)%appParametrs.getYear()%personPair.second << std::flush;
+			std::string SQL = ss.str(); // Запрос для заполнения content
+			std::cout << "SQL = " << SQL << std::endl;
+			int mysql_status = 0;
+			mysql_status = mysql_query(appParametrs.getDescriptorBD(), SQL.c_str());
+			if (mysql_status){
+				std::cout << "Ошибка при выполнении запроса: " << SQL << std::endl;
 			}
-			content[row] = std::make_tuple(cod_person, std::string(""), vectorOfHolidays, nullptr);
+			else {
+				data_from_BD = mysql_store_result(appParametrs.getDescriptorBD());
+				MYSQL_ROW row_holiday;
+				std::vector<THoliday> *vectorOfHolidays = new std::vector<THoliday>();
+				row_holiday = mysql_fetch_row(data_from_BD);
+				while (row_holiday){ 
+					THoliday newHoliday(boost::lexical_cast<int>(row_holiday[0]), row_holiday[2], boost::lexical_cast<int>(row_holiday[3]), boost::lexical_cast<int>(row_holiday[4]), row_holiday[1]);
+					vectorOfHolidays->push_back(newHoliday);
+					row_holiday = mysql_fetch_row(data_from_BD);
+				}
+				content[personPair.first] = std::make_tuple(personPair.second, std::string(""), vectorOfHolidays, nullptr);
+			}
 		}
 	}
 	else if (mode == TXT) {
 		std::cout << "Mode of HolidayListModel = TXT\n";
-		std::vector<THoliday> *vectorOfHolidays = new std::vector<THoliday>();
-		content[row] = std::make_tuple(cod_person, std::string(""), vectorOfHolidays, nullptr);
-		//ValuesFromXML PersonsFile("holidays.xml");			
+		for (auto personPair : persons){
+			std::vector<THoliday> *vectorOfHolidays = new std::vector<THoliday>();
+			content[personPair.first] = std::make_tuple(personPair.second, std::string(""), vectorOfHolidays, nullptr);
+		}
 	}
 	else {
 		std::cerr << "Constructor PersonModel executed with incorrect parametrs\n";
@@ -56,20 +61,24 @@ HolidayListModel::HolidayListModel(int row, int cod_person,  MODE mode):HolidayT
 }
 
 Qt::ItemFlags HolidayListModel::flags(const QModelIndex &index) const{
+	std::cout << "HolidayTableModel::flags()\n";
 	Qt::ItemFlags theFlags;
 	if (index.isValid()){
 		theFlags |= Qt::ItemIsEnabled|Qt::ItemIsSelectable;
 	}
 	return theFlags;
 }
+
 bool HolidayListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+	std::cout << "HolidayTableModel::setData()\n";
 	return true;
 }
 
 QVariant HolidayListModel::data(const QModelIndex &index, int role) const
 {
-	const int& key = indexRow;
+	std::cout << "HolidayTableModel::data()\n";
+	const int& key = m_indexRow;
 	if (!index.isValid() || index.row() < 0 || index.row() > std::get<2>(content.at(key))->size() - 1
 		|| index.column() < 0 || index.column() > 1)
 		return QVariant();
@@ -87,8 +96,15 @@ QVariant HolidayListModel::data(const QModelIndex &index, int role) const
 
 int HolidayListModel::rowCount(const QModelIndex& index) const
 {
-	const int& key = indexRow;
-	return index.isValid() ? 0 : std::get<2>(content.at(key))->size();
+	std::cout << "HolidayListModel::rowCount()\n";
+	const int& key = m_indexRow;
+	std::cout << "row = " << m_indexRow << std::endl;
+	try {
+		return index.isValid() ? 0 : std::get<2>(content.at(key))->size();
+	}
+	catch (...) {
+		return 0;
+	}
 }
 
 int HolidayListModel::columnCount(const QModelIndex& index) const
@@ -109,9 +125,9 @@ QModelIndex HolidayListModel::parent ( const QModelIndex & ) const
 bool HolidayListModel::removeRows(int row, int count, const QModelIndex & parent)
 {
 	beginRemoveRows(parent, row, row+count - 1);
-	auto it = std::get<2>(content.at(indexRow))->cbegin();
+	auto it = std::get<2>(content.at(m_indexRow))->cbegin();
 	for (int i = row; i < row+count; ++i){
-		std::get<2>(content.at(indexRow))->erase(it+i);
+		std::get<2>(content.at(m_indexRow))->erase(it+i);
 	}
 	endRemoveRows();
 	return true;
@@ -146,8 +162,14 @@ void HolidayListModel::printContent()
 
 void HolidayListModel::addHoliday(const THoliday holiday)
 {
-	std::vector<THoliday> *holidays = std::get<2>(content[indexRow]);
+	std::vector<THoliday> *holidays = std::get<2>(content[m_indexRow]);
 	holidays->push_back(holiday);
-	emit dataChanged(createIndex(0, 0), createIndex(std::get<2>(content[indexRow])->size() - 1, 0));
+	emit dataChanged(createIndex(0, 0), createIndex(std::get<2>(content[m_indexRow])->size() - 1, 0));
+}
+
+void HolidayListModel::setPosition(int row, int codPerson)
+{
+	m_indexRow = row;
+	emit dataChanged(createIndex(0, 0), createIndex(std::get<2>(content[m_indexRow])->size() - 1, 0));
 }
 

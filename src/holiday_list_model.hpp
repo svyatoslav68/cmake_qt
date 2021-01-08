@@ -16,7 +16,7 @@ class HolidayListModel: public HolidayTableModel {
 public:
 	enum MODE {SQL, TXT};
 	/*HolidayTableModel(std::vector<std::string> persons);*/
-	explicit HolidayListModel(int row, int cod_person, MODE mode = TXT);
+	explicit HolidayListModel(std::vector<std::pair<int, int>> persons, MODE mode = TXT);
 	~HolidayListModel() {}
 	/* Методы QAbstractItemModel, которые необходимо переопределять *********
 	 * в классе-потомке            *****************************************/
@@ -29,13 +29,16 @@ public:
 	QModelIndex parent ( const QModelIndex & ) const;
 	bool removeRows(int row, int count = 1, const QModelIndex &parent = QModelIndex());
 	/***********************************************************************/
+	int getIndexRow() {return m_indexRow;}
 	void printContent();
 public slots:
+	void setPosition(int row, int codPerson);
 	void addHoliday(const THoliday holiday);
 	void loadFromTxt();
 	void loadFromBd();
 private:
-	int indexRow;
+	MODE m_mode;
+	int m_indexRow;
 private slots:
 	void clearContent();
 };
