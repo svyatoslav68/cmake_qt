@@ -88,8 +88,7 @@ set_target_properties(
 	)
 
 if (EXISTS ${SOURCE_DIR}/settings.xml) 
-	if (NOT EXISTS ${CMAKE_BINARY_DIR}/settings.xml) 
-		add_custom_command(TARGET ${TARGET_APP} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SOURCE_DIR}/settings.xml ${CMAKE_BINARY_DIR}/settings.xml) 
-	endif()	
+		add_custom_command(TARGET ${TARGET_APP} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SOURCE_DIR}/settings.xml ${CMAKE_BINARY_DIR}/settings.xml) 
+		message("-- Add command for copying settings.xml to ${CMAKE_BINARY_DIR} ...")
 endif()
 #message("Исполняемый файл ${CMAKE_CURRENT_SOURCE_DIR} помещается в каталог:  ${CMAKE_BINARY_DIR}")
