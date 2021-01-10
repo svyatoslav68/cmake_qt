@@ -19,7 +19,6 @@ extern clParametrs appParametrs;
 
 HolidayListModel::HolidayListModel(std::vector<std::pair<int, int>> persons, MODE mode):HolidayTableModel(), m_mode(mode), m_indexRow(-1)
 {
-	std::cout << "Constructor of HolidayListModel\n";
 	if (mode == SQL) {
 		std::cout << "Mode of HolidayListModel = SQL\n";
 		std::string template_SQL_for_Fill = ValuesFromXML(appParametrs.getNameConfFile().c_str()).getStrSQL("FILE.SQL", "THoliday", "getPersonHolidays");
@@ -61,7 +60,6 @@ HolidayListModel::HolidayListModel(std::vector<std::pair<int, int>> persons, MOD
 }
 
 Qt::ItemFlags HolidayListModel::flags(const QModelIndex &index) const{
-	std::cout << "HolidayTableModel::flags()\n";
 	Qt::ItemFlags theFlags;
 	if (index.isValid()){
 		theFlags |= Qt::ItemIsEnabled|Qt::ItemIsSelectable;
@@ -71,13 +69,11 @@ Qt::ItemFlags HolidayListModel::flags(const QModelIndex &index) const{
 
 bool HolidayListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-	std::cout << "HolidayTableModel::setData()\n";
 	return true;
 }
 
 QVariant HolidayListModel::data(const QModelIndex &index, int role) const
 {
-	std::cout << "HolidayTableModel::data()\n";
 	const int& key = m_indexRow;
 	if (!index.isValid() || index.row() < 0 || index.row() > std::get<2>(content.at(key))->size() - 1
 		|| index.column() < 0 || index.column() > 1)
@@ -96,7 +92,6 @@ QVariant HolidayListModel::data(const QModelIndex &index, int role) const
 
 int HolidayListModel::rowCount(const QModelIndex& index) const
 {
-	std::cout << "HolidayListModel::rowCount()\n";
 	const int& key = m_indexRow;
 	std::cout << "row = " << m_indexRow << std::endl;
 	try {

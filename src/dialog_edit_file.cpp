@@ -140,12 +140,17 @@ void DialogEditTxtFile::saveFile()
 	bool openFile = false;
 	PersonsFile file(m_name_file.c_str());
 	file.savePersons(personModel->getContent());
-	std::cout << "В файл: " << m_name_file << "\n";
+	if (viewPersons->currentIndex().isValid()){
+		std::cout << "Сохраняем отпуска для " << personModel->data(viewPersons->currentIndex(), Qt::DisplayRole).toString().toStdString() << std::endl;
+		std::vector<PersonsFile::holiday> vectorHolidays;
+		file.saveHolidays(viewPersons->currentIndex().row() + 1, vectorHolidays);
+	}
+/*	std::cout << "В файл: " << m_name_file << "\n";
 	std::cout << "Мы пытались сохранить следующее:\n";
 	for (auto [id, position, fio] : personModel->getContent()){
 		const char * str_position = position.size()?std::string(" "+position).c_str():""; 
 		std::cout << id << ":" << str_position << fio.c_str() << std::endl;
-	}
+	}*/
 }
 
 void DialogEditTxtFile::showDialogHoliday()

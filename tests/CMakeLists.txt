@@ -126,3 +126,8 @@ set_target_properties(
 	${TARGET_XML} PROPERTIES
 	CXX_STANDARD 17
 	)
+
+if (EXISTS ${SOURCE_APP}/settings.xml) 
+		add_custom_command(TARGET ${TARGET_DIALOG} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SOURCE_APP}/settings.xml ${CMAKE_BINARY_DIR}/settings.xml) 
+		message("-- Add command for copying settings.xml to ${CMAKE_BINARY_DIR} ...")
+endif()
