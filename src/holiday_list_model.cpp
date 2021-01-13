@@ -17,7 +17,7 @@ extern clParametrs appParametrs;
 
 //std::map<int, std::tuple<int, std::vector<THoliday>>> HolidayListModel::content;
 
-HolidayListModel::HolidayListModel(std::vector<std::pair<int, int>> persons, MODE mode):HolidayTableModel(), m_mode(mode), m_indexRow(-1)
+HolidayListModel::HolidayListModel(std::vector<std::pair<int, int>> persons, std::string nameFile, MODE mode):HolidayTableModel(), m_mode(mode), m_indexRow(-1), m_nameFile(mode==TXT?nameFile:"")
 {
 	if (mode == SQL) {
 		std::cout << "Mode of HolidayListModel = SQL\n";
@@ -93,7 +93,7 @@ QVariant HolidayListModel::data(const QModelIndex &index, int role) const
 int HolidayListModel::rowCount(const QModelIndex& index) const
 {
 	const int& key = m_indexRow;
-	std::cout << "row = " << m_indexRow << std::endl;
+	//std::cout << "row = " << m_indexRow << std::endl;
 	try {
 		return index.isValid() ? 0 : std::get<2>(content.at(key))->size();
 	}
@@ -162,9 +162,27 @@ void HolidayListModel::addHoliday(const THoliday holiday)
 	emit dataChanged(createIndex(0, 0), createIndex(std::get<2>(content[m_indexRow])->size() - 1, 0));
 }
 
-void HolidayListModel::setPosition(int row, int codPerson)
+void HolidayListModel::setPosition(const int &row, const int &codPerson)
 {
 	m_indexRow = row;
+	std::get<2>(content[m_indexRow])->clear();
+	PersonsFile file(m_nameFile.c_str());
+	std::vector<PersonsFile::holiday> v_h = file.getHolidays(m_indexRow+1);
+	for (auto hol : v_h){
+		//std::cout << "date = " << hol.str_date_begin << "; duration = " << hol.duration << std::endl;	
+		addHoliday(THoliday(-1, hol.str_date_begin, hol.duration, hol.days_travel, "From file"));
+	}
 	emit dataChanged(createIndex(0, 0), createIndex(std::get<2>(content[m_indexRow])->size() - 1, 0));
+}
+
+std::vector<PersonsFile::holiday> HolidayListModel::getHolidaysForSaving()
+{
+	using namespace boost::gregorian;
+	std::vector<PersonsFile::holiday> result;
+	for (auto it_holiday : *(std::get<2>(content.at(m_indexRow)))){
+		PersonsFile::holiday newHoliday(to_iso_extended_string(it_holiday.beginDate()), it_holiday.numberDaysHoliday(), it_holiday.numberDaysTravel());
+		result.push_back(newHoliday);
+	}
+	return result;
 }
 

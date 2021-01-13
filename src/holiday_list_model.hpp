@@ -8,6 +8,8 @@
 //#include "tholiday.hpp"
 //#include <QAbstractItemModel>
 #include "holiday_table_model.hpp"
+#include "str_from_file.hpp"
+
 class THoliday;
 class QModelIndex;
 
@@ -16,7 +18,7 @@ class HolidayListModel: public HolidayTableModel {
 public:
 	enum MODE {SQL, TXT};
 	/*HolidayTableModel(std::vector<std::string> persons);*/
-	explicit HolidayListModel(std::vector<std::pair<int, int>> persons, MODE mode = TXT);
+	explicit HolidayListModel(std::vector<std::pair<int, int>> persons, std::string nameFile = "", MODE mode = TXT);
 	~HolidayListModel() {}
 	/* Методы QAbstractItemModel, которые необходимо переопределять *********
 	 * в классе-потомке            *****************************************/
@@ -30,15 +32,17 @@ public:
 	bool removeRows(int row, int count = 1, const QModelIndex &parent = QModelIndex());
 	/***********************************************************************/
 	int getIndexRow() {return m_indexRow;}
+	std::vector<PersonsFile::holiday> getHolidaysForSaving();
 	void printContent();
 public slots:
-	void setPosition(int row, int codPerson);
+	void setPosition(const int &row, const int &codPerson);
 	void addHoliday(const THoliday holiday);
 	void loadFromTxt();
 	void loadFromBd();
 private:
 	MODE m_mode;
 	int m_indexRow;
+	std::string m_nameFile;
 private slots:
 	void clearContent();
 };

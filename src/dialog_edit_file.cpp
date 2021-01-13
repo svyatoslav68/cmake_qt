@@ -26,12 +26,12 @@ DialogEditTxtFile::DialogEditTxtFile(MODE source, QWidget *parent):m_source(sour
 		setWindowTitle(QString("Содержимое файла: %1").arg(m_name_file.c_str()));
 		personModel = new PersonListModel(PersonModel::TXT, this);
 		connect(viewPersons, &QListView::clicked, this, [this](const QModelIndex &index){this->changeIndexPerson(viewPersons->currentIndex());});
-		holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::TXT);
+		holidaysModel = new HolidayListModel(personModel->pairOfPersons());
 	}
 	else if (m_source == SQL) {
 		setWindowTitle(QString("Содержимое БД"));
 		personModel = new PersonListModel(PersonModel::SQL, this);
-		holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::SQL);
+		holidaysModel = new HolidayListModel(personModel->pairOfPersons(), "",  HolidayListModel::SQL);
 	}
 	viewPersons->setModel(personModel);
 	viewHolidays->setModel(holidaysModel);
@@ -130,7 +130,7 @@ std::string DialogEditTxtFile::selectFile()
 		//std::cout << "Employee: " << p.id_employee << ":" << p.family << std::endl;
 		personModel->addPerson(p.id_employee, p.position, p.family);
 	}
-	holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::TXT);
+	holidaysModel = new HolidayListModel(personModel->pairOfPersons(), m_name_file);
 	viewHolidays->setModel(holidaysModel);
 	return m_name_file;
 }
@@ -142,8 +142,7 @@ void DialogEditTxtFile::saveFile()
 	file.savePersons(personModel->getContent());
 	if (viewPersons->currentIndex().isValid()){
 		std::cout << "Сохраняем отпуска для " << personModel->data(viewPersons->currentIndex(), Qt::DisplayRole).toString().toStdString() << std::endl;
-		std::vector<PersonsFile::holiday> vectorHolidays;
-		file.saveHolidays(viewPersons->currentIndex().row() + 1, vectorHolidays);
+		file.saveHolidays(viewPersons->currentIndex().row() + 1, holidaysModel->getHolidaysForSaving());
 	}
 /*	std::cout << "В файл: " << m_name_file << "\n";
 	std::cout << "Мы пытались сохранить следующее:\n";
@@ -191,7 +190,7 @@ void DialogEditTxtFile::slotLoadBD()
 	if (holidaysModel) {
 		delete holidaysModel;
 	}
-	holidaysModel = new HolidayListModel(personModel->pairOfPersons(), HolidayListModel::SQL);
+	holidaysModel = new HolidayListModel(personModel->pairOfPersons(), "", HolidayListModel::SQL);
 	viewHolidays->setModel(holidaysModel);
 }
 
@@ -207,9 +206,4 @@ void DialogEditTxtFile::changeIndexPerson(const QModelIndex &index)
 	buEditHoliday->setEnabled(true);
 	buDeleteHoliday->setEnabled(true);
 	holidaysModel->setPosition(index.row(), personModel->PersonModel::data(index, Qt::DisplayRole).toInt());
-	//QModelIndex modifyIndex = index.siblingAtColumn(PersonModel::ID);
-	//std::cout << "row = " << index.row() << ", column = " << index.column() << ", id = " << personModel->PersonModel::data(index, Qt::DisplayRole).toInt() << std::endl;
-	//holidaysModel = new HolidayListModel(index.row(), personModel->PersonModel::data(index, Qt::DisplayRole).toInt(), (m_source == SQL)?HolidayListModel::SQL:HolidayListModel::TXT);
-	//viewHolidays->setModel(holidaysModel);
-	//holidaysModel->printContent();
 }
