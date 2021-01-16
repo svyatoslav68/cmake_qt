@@ -1,6 +1,7 @@
 # Directory C++ temporary files
 .build
 tests/.build
+.AppleDouble
 
 .DS_Store
 .git

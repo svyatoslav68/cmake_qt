@@ -18,7 +18,7 @@ class QModelIndex;
 class HolidayTableModel: public QAbstractItemModel {
 	Q_OBJECT
 public:
-	enum Column {Number, FIO, Holidays};
+	enum Column {Number, FIO, Holidays, Point};
 	enum MODE {SQL, TXT};
 	/*HolidayTableModel(std::vector<std::string> persons);*/
 	HolidayTableModel();
@@ -35,6 +35,7 @@ public:
 	QModelIndex parent ( const QModelIndex & ) const;
 	/*********************************************************************/
 	void loadFromBD();
+	std::vector<THoliday> *getHolidaysForPerson(const int row);
 	void fillConflicts(); //const std::vector<int> &changedRows);
 	void saveToTxt(std::string nameTxtFile);
 	void saveToBD();

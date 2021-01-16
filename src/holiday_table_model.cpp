@@ -89,6 +89,8 @@ QVariant HolidayTableModel::data(const QModelIndex &index, int role) const{
 			 }
 			 return list_person_holidays;
 			}
+			/*case Point:
+				return QVariant(static_cast<uint>(std::get<2>(content.at(index.row()))));*/
 			default: return -1;
 		}
 	}
@@ -105,6 +107,9 @@ QVariant HolidayTableModel::data(const QModelIndex &index, int role) const{
 		}
 		else
 			return QVariant();
+	}
+	if (role ==Qt::UserRole){
+		return QVariant();//static_cast<uint>(std::get<2>(content.at(index.row()))));
 	}
 	return QVariant();
 }
@@ -373,5 +378,10 @@ void HolidayTableModel::outChangedData(){
 		}
 		std::cout << std::endl;
 	}
+}
+
+std::vector<THoliday> *HolidayTableModel::getHolidaysForPerson(const int row)
+{
+	return std::get<2>(content.at(row));
 }
 
